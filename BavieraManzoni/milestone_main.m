@@ -54,7 +54,7 @@ end
 
 
 %% OU-TS
-alpha = 0.5; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
+alpha = -1; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 tic
 Xt = fgmc(X0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 'OU-TS');

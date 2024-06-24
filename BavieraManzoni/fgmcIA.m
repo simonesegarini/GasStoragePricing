@@ -92,7 +92,7 @@ switch model
         end
 end
 
-% COmpute the parameters for the FFT discretization
+% Compute the parameters for the FFT discretization.
 u_N = 0.5 * du * (N - 1); u_1 = -u_N;
 dx = 2 * pi / (N * du); x_1 = -dx * (N - 1) / 2; x_N = -x_1;
 
@@ -109,25 +109,31 @@ numericalParams.x1 = x_1;
 numericalParams.xN = x_N;
 numericalParams.dx = dx;
 
-% Assign an empirical initial grid centered around zero, used to find the
-% values of x for the CDF.
-xgrid = -5:dx:5;
+xgrid = -20:dx:20;
 
-% FFT to retrieve the CDF on the xgrid
-% First assign the function for the FFT
+% FFT to retrieve the CDF on the xgrid.
+% First assign the function for the FFT.
 f = @(u) exp(LogCharFunc(u + 1i .* a, dt, params, model, activity)) ./ (1i .* (u + 1i .* a));
 
 I_fft = computeFFT(f, xgrid, numericalParams);
 RawCDF = Ra - exp(a .* xgrid) ./ (2 * pi) .* I_fft;
 
-% Plot of the CDF obtained by inverting the CF.
-figure;
-plot(xgrid, RawCDF, '-k');
-title(['Raw CDF with alpha = ', num2str(alpha)])
+% Remove NaN values.
+valid_idxs = ~isnan(RawCDF);
+xgrid = xgrid(valid_idxs);
+RawCDF = RawCDF(valid_idxs);
+
+% Plot of the CDF obtained by inverting the CF, uncomment if needed.
+% figure;
+% plot(xgrid, RawCDF, '-k');
+% title(['Raw CDF with alpha = ', num2str(alpha)])
 
 % Restrict the xgrid by taking the largest set where the raw CDF is
 % monotone increasing.
-[xgrid_hat, CDF_hat] = approxCDF(RawCDF, xgrid);
+[xgrid_hat, CDF_hat] = approxCDF(RawCDF, xgrid, 1e-9);
+[CDF_hat, idxs_unique] = unique(CDF_hat);
+xgrid_hat = xgrid_hat(idxs_unique);
+
 
 % Use spline interpolation within the range and exponential extrapolation
 % outside.
@@ -166,14 +172,15 @@ incrUnder = 1/bUnder .* log(UUnder./aUnder);
 increments(U > CDF_hat(end)) = incrOver;
 increments(U < CDF_hat(1)) = incrUnder;
 
-figure;
-plot(xgrid_hat, CDF_hat, '--r')
-title(['Plot with alpha = ', num2str(alpha)])
-hold on;
-plot(increments(1:100), U(1:100), 'ok');
-first_last = [xgrid_hat(1), CDF_hat(1); xgrid_hat(end), CDF_hat(end)];
-plot(first_last(:, 1), first_last(:, 2), '*g')
-plot(incrOver, UOver, 'db')
-plot(incrUnder, UUnder, 'db')
-legend('Interpolated Inverted CDF', 'Interpolated values', 'Limits', 'Exponential extrapolation Over', 'Exponential extrapolation Under')
+% Final plot, uncomment if needed.
+% figure;
+% plot(xgrid_hat, CDF_hat, '--r')
+% title(['Plot with alpha = ', num2str(alpha)])
+% hold on;
+% plot(increments(1:100), U(1:100), 'ok');
+% first_last = [xgrid_hat(1), CDF_hat(1); xgrid_hat(end), CDF_hat(end)];
+% plot(first_last(:, 1), first_last(:, 2), '*g')
+% plot(incrOver, UOver, 'db')
+% plot(incrUnder, UUnder, 'db')
+% legend('Interpolated Inverted CDF', 'Interpolated values', 'Limits', 'Exponential extrapolation Over', 'Exponential extrapolation Under')
 end

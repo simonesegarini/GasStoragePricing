@@ -1,5 +1,5 @@
 function values = LogCharFunc(us, t, params, model, activity)
-% Log Charachteristic Functionof a Levy process, return the values given a
+% Log Charachteristic Function of a Levy process, return the values given a
 % vector of u and a specified time t
 %
 % INPUT:

@@ -1,6 +1,7 @@
-function [xgrid, CDF_hat] = approxCDF(cdf_raw, z)
-% Given the points of a function, respectively (z, cdf_raw), find the largest 
-% set of consecutive points where cdf_raw is monotone increasing and within
+function [xgrid, CDF_hat] = approxCDF(CDF_raw, xgrid_raw, toll)
+% Given the points of a function, respectively (xgrid_raw, cdf_raw), find 
+% the largest set of consecutive points where cdf_raw is monotone increasing
+% and within
 % [0, 1]. 
 % The result are given back in (xgrid, CDF_hat), the function
 % serves as a filter to obtain a Cumulative Distribution Function from our
@@ -21,8 +22,8 @@ end_index = 1;
 
 % Iterate through cdf_raw to find the largest set.
 current_length = 1;
-for i = 2:length(cdf_raw)
-    if cdf_raw(i) >= cdf_raw(i-1) && cdf_raw(i) <= 1 && cdf_raw(i) >= 0
+for i = 2:length(CDF_raw)
+    if CDF_raw(i) >= CDF_raw(i-1)-toll && CDF_raw(i) <= 1 && CDF_raw(i) >= 0
         current_length = current_length + 1;
         if current_length > max_length
             max_length = current_length;
@@ -36,8 +37,8 @@ end
 
 % Extract the x-grid values corresponding to the largest set of consecutive
 % points.
-xgrid = z(start_index:end_index);
-CDF_hat = cdf_raw(start_index:end_index);
+xgrid = xgrid_raw(start_index:end_index);
+CDF_hat = CDF_raw(start_index:end_index);
 
 % Check if the first value of CDF_hat is negative.
 if CDF_hat(1) < 0
@@ -54,5 +55,4 @@ if CDF_hat(1) < 0
         CDF_hat = [];
     end
 end
-
 end

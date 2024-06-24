@@ -4,7 +4,6 @@ function I = computeFFT(f, interpolationGrid, numericalParams)
 % 
 % INPUT: 
 % f:                    integrand as a function handle
-% interpolationGrid:    moneyness of interest as a vector
 % numericalParams:      parameters of the numerical method as a struct
 %
 % OUTPUT: 
@@ -23,9 +22,7 @@ fj=fu.*exp(-1i*numericalParams.x1*numericalParams.du*(0:(N-1))); % fj.
 
 FFT=fft(fj); % Fast Fourier Transform of fj.
 
-Curve=numericalParams.du*exp(-1i*numericalParams.u1*x).*FFT; % moltiplication of the prefactor.
+Curve=numericalParams.du*exp(-1i*numericalParams.u1*x).*FFT; % moltiplication of the prefactor
 
-% Interpolation in the given grid to obtain the values nedeed.
-I=real(interp1(x,Curve,interpolationGrid));
-    
+I=real(interp1(x,Curve,interpolationGrid));   
 end
