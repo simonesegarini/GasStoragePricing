@@ -1,5 +1,10 @@
 function [xgrid, CDF_hat] = approxCDF(cdf_raw, z)
-% Find the largest set of consecutive points where CDF is monotone increasing and within [0, 1]
+% Given the points of a function, respectively (z, cdf_raw), find the largest 
+% set of consecutive points where cdf_raw is monotone increasing and within
+% [0, 1]. 
+% The result are given back in (xgrid, CDF_hat), the function
+% serves as a filter to obtain a Cumulative Distribution Function from our
+% data.
 %
 % INPUT:
 % cdf_raw:              raw approximation of the cdf from the FFT
@@ -9,12 +14,12 @@ function [xgrid, CDF_hat] = approxCDF(cdf_raw, z)
 % xgrid:                xgrid of the cdf
 % CDF_hat:              approximated cdf
 
-% Initialize variables to keep track of the largest set
+% Initialize variables to keep track of the largest set.
 max_length = 0;
 start_index = 1;
 end_index = 1;
 
-% Iterate through cdf_raw to find the largest set
+% Iterate through cdf_raw to find the largest set.
 current_length = 1;
 for i = 2:length(cdf_raw)
     if cdf_raw(i) >= cdf_raw(i-1) && cdf_raw(i) <= 1 && cdf_raw(i) >= 0
@@ -29,20 +34,22 @@ for i = 2:length(cdf_raw)
     end
 end
 
-% Extract the x-grid values corresponding to the largest set of consecutive points
+% Extract the x-grid values corresponding to the largest set of consecutive
+% points.
 xgrid = z(start_index:end_index);
 CDF_hat = cdf_raw(start_index:end_index);
 
-% Check if the first value of CDF_hat is negative
+% Check if the first value of CDF_hat is negative.
 if CDF_hat(1) < 0
     % Find the first non-negative value
     first_positive_index = find(CDF_hat >= 0, 1);
     if ~isempty(first_positive_index)
-        % Adjust the xgrid and CDF_hat to start from the first non-negative value
+        % Adjust the xgrid and CDF_hat to start from the first non-negative
+        % value.
         xgrid = xgrid(first_positive_index:end);
         CDF_hat = CDF_hat(first_positive_index:end);
     else
-        % If all values are negative, return empty arrays
+        % If all values are negative, return empty arrays.
         xgrid = [];
         CDF_hat = [];
     end

@@ -12,83 +12,95 @@ function increments = fgmcIA(U, params, M, dt, model, activity)
 % OUTPUT:
 % increment:            Z_deltaTj, stochastic increment for OU-Levy
 
-% Assign parameters and compute analyticity strip
-if strcmp(model, 'OU-NTS') || strcmp(model, 'NTS-OU')
-    alpha = params(1); b = params(2); sigma = params(3);
-    k = params(4); theta = params(5);
+% Proceed to assign parameters, compute analyticity strip (p_n, p_p) and
+% compute the optimal step du for the FFT code.
+% For the finite activity processes du was found by checking the one that
+% gave empirical cumulants closer to the theoretical ones.
+%
+% Finite activity processes have power decay, infinite activity have
+% exponential decay. Special cases are commented.
 
-    A_as = sqrt(theta^2 + (2*sigma^2*(1-alpha)) / k);
-    p_n = (theta - A_as) / (sigma.^2);
-    p_p = (theta + A_as) / (sigma.^2);
+alpha = params(1); b = params(2);
+N = 2^M; % Needed for optimal du computation
 
-elseif strcmp(model, 'OU-TS') || strcmp(model, 'TS-OU')
-    alpha = params(1); b = params(2); beta_p = params(3);
-    beta_n = params(4); c_p = params(5); c_n = params(6);
-
-    p_n = -beta_p;
-    p_p = beta_n;
-end
-
-N = 2^M;
-
-% Select shift & FFT parameters based on the decay of the process
-if strcmp(activity, 'Finite') && (strcmp(model, 'OU-NTS') || strcmp(model, 'NTS-OU')) % Power decay
-    a = abs(0.25 * max(-p_n, p_p));
-
-    du = 0.0971; u_N = 0.5 * du * (N - 1); u_1 = -u_N; % Best for OU-NTS
-    dx = 2 * pi / (N * du); x_1 = -dx * (N - 1) / 2; x_N = -x_1;
-
-elseif strcmp(activity, 'Finite') && (strcmp(model, 'OU-TS') || strcmp(model, 'TS-OU')) % Power decay
-    a = abs(0.25 * max(-p_n, p_p));
-
-    du = 0.4; u_N = 0.5 * du * (N - 1); u_1 = -u_N; % Best for OU-NTS
-    dx = 2 * pi / (N * du); x_1 = -dx * (N - 1) / 2; x_N = -x_1;
-
-elseif strcmp(activity, 'Infinite') % Exponential decay
-    if alpha == 0  % OU-GAMMA TS AND OU-VG NTS CASES
-        a = 0.25 * max(-p_n, p_p);
-
-        du = 0.0971; u_N = 0.5 * du * (N - 1); u_1 = -u_N;
-        dx = 2 * pi / (N * du); x_1 = -dx * (N - 1) / 2; x_N = -x_1;
-    else
-        a = 0.5 * max(-p_n, p_p);
+switch model
+    case {'OU-NTS', 'NTS-OU'}
+        sigma = params(3);
+        k = params(4); theta = params(5);
+    
+        A_as = sqrt(theta^2 + (2 * sigma^2 * (1 - alpha)) / k);
+        p_n = (theta - A_as) / (sigma^2);
+        p_p = (theta + A_as) / (sigma^2);
         
-        % Infinite activity we select N and get du from the relation .33
-        if strcmp(model, 'OU-NTS')
-            omega = 2 * alpha;
-            l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt)) / (2 * alpha * b);
-        
-        elseif strcmp(model, 'NTS-OU')
-            omega = 2 * alpha;
-            l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt));
-        
-        elseif strcmp(model, 'OU-TS')
-            omega = alpha;
-            scale = 1;
-            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b *dt)) / (alpha * b) * scale^alpha;
-        
-        elseif strcmp(model, 'TS-OU')
-            if alpha == 1
-                omega = 1;
-                l = (c_p + c_n) * pi / 2 * (1 - exp(-b * dt));
-            else
-                omega = alpha;
-                scale = 1;
-                l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) * scale^alpha;
-            end
+        switch activity
+            case 'Finite'
+                a = abs(0.25 * max(-p_n, p_p));
+                du = 0.0971; % Best for NTS
+            case 'Infinite'
+                if alpha == 0 % OU-VG case (Variance Gamma, NTS), power decay.
+                    a = 0.25 * max(-p_n, p_p);
+                    du = 0.0971;
+                else
+                    a = 0.5 * max(-p_n, p_p);
+                    omega = 2 * alpha;
+                    if strcmp(model, 'OU-NTS') % OU-NTS GENERAL CASE
+                        l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt)) / (2 * alpha * b);
+                    else % NTS-OU GENERAL CASE
+                        l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt));
+                    end
+                    du = (2 * pi * abs(a) / (l * N^omega))^(1 / (omega + 1));
+                end
         end
+        
+    case {'OU-TS', 'TS-OU'}
+        beta_p = params(3); beta_n = params(4); c_p = params(5); c_n = params(6);
+    
+        p_n = -beta_p;
+        p_p = beta_n;
 
-        du = (2 * pi * abs(a) / (l * N^omega))^(1 / (omega + 1));
-        u_1 = -(N - 1) / 2 * du; u_N = -u_1;
-        dx = 2 * pi / (N * du);
-        x_1 = -dx * (N - 1) / 2; x_N = -x_1;
-    end
+        switch activity
+            case 'Finite'
+                a = abs(0.25 * max(-p_n, p_p));
+                du = 0.4; % Best for TS
+            case 'Infinite'
+                if alpha == 0 % OU-Gamma case (TS), power decay.
+                    a = 0.25 * max(-p_n, p_p);
+                    du = 0.0971;
+                else
+                    a = 0.5 * max(-p_n, p_p);
+                    if strcmp(model, 'OU-TS')
+                        if alpha == 1 % Other special case for OU-TS, exp decay.
+                            omega = 1;
+                            l = (c_p + c_n) * pi / 2 * (1 - exp(-b * dt)) / b;
+                        else % GENERAL OU-TS CASE.
+                            omega = alpha;
+                            scale = 1;
+                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) / (alpha * b) * scale^alpha;
+                        end
+                    else % TS-OU
+                        if alpha == 1 % Other special case for TS-OU, exp decay.
+                            omega = 1;
+                            l = (c_p + c_n) * pi / 2 * (1 - exp(-b * dt));
+                        else % GENERAL TS-OU CASE.
+                            omega = alpha;
+                            scale = 1;
+                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) * scale^alpha;
+                        end
+                    end
+                    du = (2 * pi * abs(a) / (l * N^omega))^(1 / (omega + 1));
+                end
+        end
 end
+
+% COmpute the parameters for the FFT discretization
+u_N = 0.5 * du * (N - 1); u_1 = -u_N;
+dx = 2 * pi / (N * du); x_1 = -dx * (N - 1) / 2; x_N = -x_1;
 
 Ra = a < 0;
 
 disp(['Caso: ', model, ', alpha = ', num2str(alpha), ', du = ', num2str(du)])
 
+% Assign values to the struct for the FFT function.
 numericalParams.M = M;
 numericalParams.u1 = u_1;
 numericalParams.uN = u_N;
@@ -97,27 +109,33 @@ numericalParams.x1 = x_1;
 numericalParams.xN = x_N;
 numericalParams.dx = dx;
 
+% Assign an empirical initial grid centered around zero, used to find the
+% values of x for the CDF.
 xgrid = -5:dx:5;
 
 % FFT to retrieve the CDF on the xgrid
+% First assign the function for the FFT
 f = @(u) exp(LogCharFunc(u + 1i .* a, dt, params, model, activity)) ./ (1i .* (u + 1i .* a));
 
-I_fft = computeIntegral(f, xgrid, numericalParams);
+I_fft = computeFFT(f, xgrid, numericalParams);
 RawCDF = Ra - exp(a .* xgrid) ./ (2 * pi) .* I_fft;
 
-% Plot of the CDF obtained by inverting the CF
+% Plot of the CDF obtained by inverting the CF.
 figure;
 plot(xgrid, RawCDF, '-k');
 title(['Raw CDF with alpha = ', num2str(alpha)])
 
-% Restrict the xgrid by taking the largest set where the raw CDF is monotone increasing
+% Restrict the xgrid by taking the largest set where the raw CDF is
+% monotone increasing.
 [xgrid_hat, CDF_hat] = approxCDF(RawCDF, xgrid);
 
-% Use spline interpolation within the range and exponential extrapolation outside
+% Use spline interpolation within the range and exponential extrapolation
+% outside.
 increments = zeros(size(U));
 idxs_within = U >= CDF_hat(1) & U <= CDF_hat(end);
 increments(idxs_within) = interp1(CDF_hat, xgrid_hat, U(idxs_within), 'spline');
-disp(length(U)-sum(idxs_within))
+disp(['Extrapolated points: ', num2str(length(U)-sum(idxs_within))])
+disp(' ')
 
 % Exponential extrapolation
 % dx as U_n+1 = 1-a*exp(-b*X_n+1)
@@ -144,7 +162,7 @@ incrUnder = 1/bUnder .* log(UUnder./aUnder);
 % incrUnder = log(UUnder/aUnder)/bUnder + xgrid_hat(1);
 % incrOver = log(-(UOver-1)/aOver)/bOver+xgrid_hat(end);
 
-% Assign the values
+% Assign the values extrapolated.
 increments(U > CDF_hat(end)) = incrOver;
 increments(U < CDF_hat(1)) = incrUnder;
 

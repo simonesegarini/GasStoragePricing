@@ -5,7 +5,7 @@ rng(2) % set seed for reproducibility
 dt = T/M;
 U = rand(N, M);
 X = zeros(N,M+1); X(:,1) = X0;
-Mfft = 21;
+Mfft = 16;
 alpha = params(1);
 b = params(2);
 

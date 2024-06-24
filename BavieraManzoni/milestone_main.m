@@ -1,6 +1,8 @@
 %% MILESTONE 1
 clear all, close all, clc
 
+% Turn off the warning for extra legend entries, just to avoid messages
+% when using the legend function
 warningID = 'MATLAB:legend:IgnoringExtraEntries';
 warning('off', warningID);
 
@@ -21,7 +23,7 @@ timeOUNTS = toc;
 
 %% OU-NTS VARYING ALPHA 
 alphas = [0.8, 0.6, 0.4, 0.2, -1.0, -2.0];
-b = 0.2162; sigma = 0.201; k = 0.256; theta = 0.1;
+b = 0.2162; sigma = 0.201; k = 0.256; theta = 0;
 
 TCumulantsOUNTSalpha = zeros(numel(alphas), 4);
 ECumulantsOUNTSalpha = zeros(numel(alphas), 4);
@@ -51,7 +53,7 @@ for i=1:numel(alphas)
 end
 
 
-%% OU-TS, TO FIX
+%% OU-TS
 alpha = 0.5; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 tic
@@ -59,7 +61,7 @@ Xt = fgmc(X0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 'OU-TS');
 timeOUTS = toc;
 [TCumulantsOUTS, ECumulantsOUTS] = computeCumulants(Xt(:,end), [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS')
 
-%% OU-TS VARYING ALPHA,TO FIX
+%% OU-TS VARYING ALPHA
 alphas = [1.6, 1.2, 0.8, 0.4, -1.0, -2.0];
 %alphas = [1.6, 1.2, 0.8, 0.4];
 %alphas = [-1.0, -2.0];
