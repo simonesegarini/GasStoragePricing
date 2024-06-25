@@ -1,4 +1,4 @@
-function [cashflows, policies, betas] = backwardInduction(S, cashflows, h, N, M, delta, alpha, T, maxInjection, maxWithdraw)
+function [cashflows, policies, regressors] = backwardInduction(S, cashflows, h, N, M, delta, alpha, T, maxInjection, maxWithdraw)
 % Simulation the evolution of the storage and the payoff with BW induction
 %
 % INPUT:
@@ -16,11 +16,11 @@ function [cashflows, policies, betas] = backwardInduction(S, cashflows, h, N, M,
 % OUTPUT:
 % cashflows:            matrix with the cashflows at t0
 % policies:             3d matrix with all the policies through time
-% regression:           regression parameters needed for OUT pricing
+% regressors:           regression parameters needed for OUT pricing
 
 policy = zeros(N, M);
 policies = zeros(T, N, M);
-betas = zeros(4, N, T-1);
+regressors = zeros(4, N, T-1);
 
 temp_cf = cashflows;
 
@@ -31,8 +31,8 @@ for j = T:-1:1 % bw iterations in time
 
     % OLS for CV
     b = cashflows;
-    betas(:, :, j) = A\b;
-    CV = (A*betas(:, :, j))';
+    regressors(:, :, j) = A\b;
+    CV = (A*regressors(:, :, j))';
 
     % check all the plausible deltaV and which one has the highest exp value
     for i =1:N

@@ -12,7 +12,7 @@ function values = LogCharFunc(us, t, params, model, activity)
 % OUTPUT:
 % values:               LCF computed in u and in t
 
-% Preallocate for speed
+% Preallocate for speed.
 values = zeros(size(us));
 
 switch model

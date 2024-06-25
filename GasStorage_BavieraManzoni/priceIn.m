@@ -16,12 +16,13 @@ function cashflows = priceIn(S, cashflows, h, N, M, delta, alpha, T, maxInjectio
 % OUTPUT:
 % cashflows:            matrix with the cashflows at t0
 
-% Allocate for speed efficiency
+% Run the procedure with two matrices to avoid using one 3d matrix,
+% computationally more efficient and memory saving.
 temp_cf = cashflows;
 
 for j = T:-1:1 % bw iterations in time
 
-    %in j i have time T+1 but S_T, if j=1 i have t = 1 but S_0
+    % In j i have time T+1 but S_T, if j=1 i have t = 1 but S_0 (idxs reference).
     A = [ones(length(S(:,j+1)),1), S(:,j+1), S(:,j+1).^2, S(:,j+1).^3]; 
 
     % OLS for CV
@@ -29,14 +30,17 @@ for j = T:-1:1 % bw iterations in time
     beta = A\b;
     CV = (A*beta)';
 
-    % check all the plausible deltaV and which one has the highest exp value
+    % Check all the plausible deltaV and which one has the highest exp value.
     for i = 1:N
         maxAction = max(maxInjection);
         minAction = min(maxWithdraw);
         
-        % Check allowed actions
+        % Create vector of actions where the values represents the quantity
+        % of deltaV that can be bought/sold (ex: 2 means I can buy 2*deltaV 
+        % quantity of gas, -3 I can sell 3*deltaV).
         actions = maxAction/alpha:-1:minAction/alpha;
         
+        % Check the possible actions, set to zero the non allowed ones.
         % Find indices where maxInjection equals alpha*actions
         idx_inj = find(maxInjection(i,j) == alpha*actions);
         if ~isempty(idx_inj)
@@ -49,14 +53,17 @@ for j = T:-1:1 % bw iterations in time
             actions(idx_withdraw+1:end) = 0;
         end
     
+        % Iterate through the simulated path to choose the best actions and
+        % compute the future cash flow.
         for z = 1:M
-            % Actions payoff + future cashflow
+            % Actions payoff + future cashflow.
             total_payoff = h(S(z,j+1), actions'.*alpha) + CV(i-actions, z);
             
-            % Determine the action with the highest expected future cash flow
+            % Determine the action with the highest expected future cash flow.
             [~, idx] = max(total_payoff);
             
-            % Update cashflow bw
+            % Update cashflow with the backward method by using the actions 
+            % with the highest expect future cash flow.
             temp_cf(z,i) = exp(-delta).*cashflows(z,i-actions(idx)) + h(S(z,j+1), actions(idx).*alpha);
         end
     end

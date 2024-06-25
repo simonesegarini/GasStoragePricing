@@ -2,9 +2,9 @@ function plotSpot(row_indices, S, type)
 % Plot the evolution of the Spot simulation for some samples
 %
 % INPUT:
-% row_indices:  idxs of the samples to plot, to give a perfect square length
-% S:            matrix with the simulations for M paths
-% type:         string with the type of simualtions, just for the title
+% row_indices:      idxs of the samples to plot, to give a perfect square length
+% S:                matrix with the simulations for M paths
+% type:             string with the type of simualtions, just for the title
 
 n = length(row_indices);
 

@@ -1,4 +1,4 @@
-function X = spotSimulation(model, params, N, M, T, Mfft, seed)
+function X = spotSimulation(model, params, N, M, T, Mfft, seed, toll)
 % Spot simulation based on model selected: OU returns 2*M simulations by
 % using AV algorithm, OU-NTS and OU-TS return M simulations using fgmc
 % algorithm
@@ -20,6 +20,6 @@ switch model
         X = spotSimulationOU(params, N, M, T, seed);
 
     case {'OU-NTS', 'OU-TS', 'NTS-OU', 'TS-OU'}
-        X = fgmc(model, params, N, M, T, Mfft, seed);
+        X = fgmc(model, params, N, M, T, Mfft, seed, toll);
 end
 end
