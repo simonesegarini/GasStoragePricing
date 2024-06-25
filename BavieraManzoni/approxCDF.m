@@ -9,7 +9,8 @@ function [xgrid, CDF_hat] = approxCDF(CDF_raw, xgrid_raw, toll)
 %
 % INPUT:
 % cdf_raw:              raw approximation of the cdf from the FFT
-% z:                    raw xgrid of the cdf
+% xgrid_raw:            raw xgrid of the cdf
+% toll:                 tollerance for CDF selection
 %
 % OUTPUT:
 % xgrid:                xgrid of the cdf

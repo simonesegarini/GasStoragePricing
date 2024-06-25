@@ -1,4 +1,4 @@
-function increments = fgmcFA(U, params, M, dt, model, activity)
+function increments = fgmcFA(U, params, M, dt, model, activity, toll)
 % FGMC method for Finite Activity processes
 %
 % INPUT:
@@ -8,6 +8,7 @@ function increments = fgmcFA(U, params, M, dt, model, activity)
 % dt:                   time step
 % model:                model selected
 % activity:             model activity, needed for the FA case
+% toll:                 tollerance for CDF selection
 %
 % OUTPUT:
 % increment:            Z_deltaTj, stochastic increment for OU-Levy/Levy-OU
@@ -49,5 +50,5 @@ idxs = find(Bt == 1);
 % Compute increments by calling the function for the inifinite activity
 % processes just where we have a jump.
 increments = zeros(size(U));
-increments(idxs) = fgmcIA(U(idxs), params, M, dt, model, activity);
+increments(idxs) = fgmcIA(U(idxs), params, M, dt, model, activity, toll);
 end

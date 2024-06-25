@@ -7,7 +7,7 @@ function X = fgmc(model, params, N, M, T, Mfft, seed)
 % N:                    number of simulations
 % M:                    number of timesteps
 % T:                    time horizon
-% Mfft:                 
+% Mfft:                 FFT hyperparameter
 % seed:                 set the seed of the simulation
 %
 % OUTPUT:

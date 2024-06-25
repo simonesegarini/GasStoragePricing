@@ -11,7 +11,7 @@ warning('off', warningID);
 T = 1/12; % Time horizon
 M = 1; % Number of steps
 N = 1e7; % Number of simulations
-seed = 2; % Seed for the random uniform sampling
+seed = 10; % Seed for the random uniform sampling
 
 %% Processes listed separately to run with the alphas of the paper all together
 
@@ -83,7 +83,7 @@ TCumulantsTSOUalpha = zeros(numel(alphas), 4);
 ECumulantsTSOUalpha = zeros(numel(alphas), 4);
 
 for i=1:numel(alphas)
-    Xt= fgmc('TS-OU', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 25, seed, 1e-12);
+    Xt= fgmc('TS-OU', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 26, seed, 1e-17);
     [TCumulantsTSOUalpha(i,:), ECumulantsTSOUalpha(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU');
 end
 
@@ -93,7 +93,7 @@ end
 % For the final results use the upper part of this script.
 
 %% OU-NTS SYMMETRIC
-alpha = -2; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0;
+alpha = 0.2; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0;
 
 tic
 Xt = fgmc('OU-NTS', [alpha, b, sigma, k, theta], N, M, T, 16, seed, 1e-8);
@@ -101,10 +101,10 @@ timeOUNTSsymm = toc;
 [TCumulantsOUNTSsymm, ECumulantsOUNTSsymm] = computeCumulants(Xt(:,end), [alpha, b, sigma, k, theta], T, 'OU-NTS')
 
 %% OU-NTS ASYMMETRIC
-alpha = 0.4; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0.1;
+alpha = 0.2; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0.1;
 
 tic
-Xt = fgmc('OU-NTS', [alpha, b, sigma, k, theta], N, M, T, 16, seed, 0);
+Xt = fgmc('OU-NTS', [alpha, b, sigma, k, theta], N, M, T, 16, seed, 1e-8);
 timeOUNTSasymm = toc;
 [TCumulantsOUNTSasymm, ECumulantsOUNTSasymm] = computeCumulants(Xt(:,end), [alpha, b, sigma, k, theta], T, 'OU-NTS')
 
@@ -136,6 +136,6 @@ timeOUTS = toc;
 alpha = 0.8; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 tic
-Xt = fgmc('TS-OU', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 25, seed, 1e-12);
+Xt = fgmc('TS-OU', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 24, seed, 1e-17);
 timeTSOU = toc;
 [TCumulantsTSOU, ECumulantsTSOU] = computeCumulants(Xt(:,end), [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU')
