@@ -47,7 +47,7 @@ for j = T:-1:1 % bw iterations in time
             % Fit the B-spline to the data and evaluate it
             for i = 1:size(cashflows, 2)
                 sp = spap2(numPieces, numKnots, S(:, j+1), cashflows(:, i));
-                CVt(:, i) = fnval(sp, S(:, j+1)); % Using a temporary variable for CV
+                CVt(:, i) = fnval(sp, S(:, j+1)); % Using a temporary variab
             end
             CV = CVt';
         

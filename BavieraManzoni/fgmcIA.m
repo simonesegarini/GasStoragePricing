@@ -76,15 +76,15 @@ increments(U < CDF_hat(1)) = incrUnder;
 % all the infos needed for debugging, uncomment if probelms arise.
 %
 % alpha = params(1);
-% 
+%
 % figure;
 % plot(xgrid, RawCDF, '-k');
 % title(['Raw CDF with alpha = ', num2str(alpha)])
-%
+% 
 % disp(['Caso: ', model, ', alpha = ', num2str(alpha), ', du = ', num2str(du)])
 % disp(['Extrapolated points: ', num2str(length(U)-sum(idxs_within))])
 % disp(' ')
-%
+% 
 % figure;
 % plot(xgrid_hat, CDF_hat, '--r')
 % title(['Plot with alpha = ', num2str(alpha)])

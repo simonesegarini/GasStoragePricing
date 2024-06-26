@@ -8,7 +8,7 @@ warningID = 'MATLAB:legend:IgnoringExtraEntries';
 warning('off', warningID);
 
 %% SIMULATION PARAMETERS
-T = 1/12; % Time horizon
+T = 1; % Time horizon
 M = 1; % Number of steps
 N = 1e7; % Number of simulations
 seed = 2; % Seed for the random uniform sampling
@@ -71,7 +71,7 @@ TCumulantsOUTSalpha = zeros(numel(alphas), 4);
 ECumulantsOUTSalpha = zeros(numel(alphas), 4);
 
 for i=1:numel(alphas)
-    Xt= fgmc('OU-TS', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 16, seed, 1e-10);
+    Xt= fgmc('OU-TS', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 18, seed, 1e-10);
     [TCumulantsOUTSalpha(i,:), ECumulantsOUTSalpha(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS');
 end
 
