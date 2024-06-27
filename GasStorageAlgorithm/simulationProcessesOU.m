@@ -1,25 +1,24 @@
 clear all, close all, clc
 
+% This script is used to simulate prices evolution and to price the
+% contract by varying parameters when more are proposed in papers.
+% Here is priced with OU process. Results are saved in .mat files.
+
 %% STANDARD STORAGE CONTRACT DATA
-% cost of injection
+% Cost of injection parameters.
 a1 = 0; b1 = 0;
 
-% cost of selling
+% Cost of selling parameters.
 a2 = 0; b2 = 0;
 
-% discount rate
+% Discount rate.
 delta = 0;
 
-% payoff
-h = @(s, deltaV) -((1+a1).*s + b1).*deltaV.*(deltaV > 0) ...
+% Payoff for each action.
+payoff = @(s, deltaV) -((1+a1).*s + b1).*deltaV.*(deltaV > 0) ...
                 - ((1-a2).*s - b2).*deltaV.*(deltaV < 0);
 
-% time reference
-ttm = 1;
-startDate= datetime(2005, 07, 01);
-endDate = datetime(2006, 06, 30);
-
-% volume constraints and values
+% volume constraints and values.
 Vmin = 0;
 Vmax = 250000;
 V0 = 100000;
@@ -40,7 +39,7 @@ S0 = 14.88;
 vols = [0.0315, 0.0945];
 
 % Number of simulations
-M = 500; 
+numberSimulations = 500; 
 
 % Discretization for the backward induction
 alpha = 2500; % width of the volume interval
@@ -58,20 +57,20 @@ for j=1:numel(vols)
     paramsOU = [vols(j), 0.05, 0]; % Parameters for the OU case
     
     % Simulation of the underlying for the OU-NTS case
-    Xs = spotSimulation(model, paramsOU, M, 365, T, 0, 1);
-    X_OU = Xs(1:M, :); XAV_OU = Xs(M+1:end, :);
+    Xs = spotSimulation(model, paramsOU, numberSimulations, 365, T, 0, 1, 0);
+    X_OU = Xs(1:numberSimulations, :); XAV_OU = Xs(numberSimulations+1:end, :);
     S_OU = S0*exp(X_OU);
     SAV_OU = S0*exp(XAV_OU);
 
 
     % 2. ASSIGN A VALUE TO THE CONTRACT AT MATURITY
     % Matrices with the cashflows
-    cashflows_OU = penFunc(S_OU(:,end), ones(M,1)*dV');
-    cashflows_OU_AV = penFunc(SAV_OU(:,end), ones(M,1)*dV');
+    cashflows_OU_T = penFunc(S_OU(:,end), ones(numberSimulations,1)*dV');
+    cashflows_OU_AV_T = penFunc(SAV_OU(:,end), ones(numberSimulations,1)*dV');
     
     % 3. APPLY BACKWARD INDUCTION
-    cashflows_OU = priceIn(S_OU, cashflows_OU, h, N, M, delta, alpha, T, maxInjection, maxWithdraw);
-    cashflows_OU_AV = priceIn(SAV_OU, cashflows_OU_AV, h, N, M, delta, alpha, T, maxInjection, maxWithdraw);
+    cashflows_OU = priceIn(S_OU, cashflows_OU_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
+    cashflows_OU_AV = priceIn(SAV_OU, cashflows_OU_AV_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 
     % 4. PRICE
     % Compute the final price as the mean of accumulated cash flows at t=0 across all simulations

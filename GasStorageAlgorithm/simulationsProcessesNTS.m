@@ -1,5 +1,7 @@
 clear all, close all, clc
 
+% TO ADJUST WITH MODIFICATIONS
+
 %% STANDARD STORAGE CONTRACT DATA
 % cost of injection
 a1 = 0; b1 = 0;

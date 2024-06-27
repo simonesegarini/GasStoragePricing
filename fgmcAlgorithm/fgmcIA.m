@@ -31,7 +31,9 @@ numericalParams.x1 = x_1;
 numericalParams.xN = x_N;
 numericalParams.dx = dx;
 
-xgrid = -20:dx:20;
+% Filter the xgrid to avoid errors when selecting the largest subset
+xgrid = x_1:dx:x_N;
+xgrid = xgrid(xgrid >= -20 & xgrid <= 20);
 
 % FFT to retrieve the CDF on the xgrid.
 % First assign the function for the FFT.

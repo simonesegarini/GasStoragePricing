@@ -43,7 +43,7 @@ switch model
         k = params(4); theta = params(5);
         if strcmp(activity, 'Infinite')
             % GENERAL CASE FOR NTS-OU, EXP LAW FOR ALPHA > 0, POWER ALPHA < 0, .43
-            values = phiXNTS(us, params) - phiXNTS(us*exp(-b*t), params);
+            values = psiXNTS(us, params) - psiXNTS(us*exp(-b*t), params);
 
         elseif strcmp(activity, 'Finite')
             aux_values = 1/(2*b*t).*log((0.5*sigma^2.*us.^2.*k - 1i.*theta.*k.*us.*exp(b*t) + exp(2*b*t))./...
@@ -110,7 +110,7 @@ switch model
 
             else % GENERAL CASE FOR TS, EXP LAW FOR AS BEHAVIOUR .16
                 % DONE DONE DONE
-                values = phiXTS(us, params) - phiXTS(us*exp(-b*t), params);
+                values = psiXTS(us, params) - psiXTS(us*exp(-b*t), params);
             end
 
         elseif strcmp(activity, 'Finite') %FIX FIX FIX
