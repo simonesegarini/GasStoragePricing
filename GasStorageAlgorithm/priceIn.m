@@ -1,5 +1,5 @@
 function cashflows = priceIn(S, cashflows, h, N, M, delta, alpha, T, maxInjection, maxWithdraw, numKnots, method)
-% IN pricing of the storage contract with BW induction
+% IN pricing of the storage contract with BW induction.
 %
 % INPUT:
 % S:                    simulations of Spot
@@ -26,28 +26,29 @@ for j = T:-1:1 % bw iterations in time
     
     % In j I have time T+1 but S_T, if j=1 I have t = 1 but S_0 (idxs reference).
 
-    % Perform regression to compute CV based on the selected method
+    % Perform regression to compute CV based on the selected method.
     switch method
         case 'polynomial'
-            % Create the design matrix for polynomial regression
+            % Create the design matrix for polynomial regression.
             A = ones(length(S(:, j+1)), numKnots);
             for d = 1:(numKnots - 1)
                 A(:,d+1) = S(:, j+1).^d;
             end
             
-            % OLS for polynomial regression
+            % OLS for polynomial regression.
             beta = A \ cashflows;
             CV = (A * beta)';
         
         case 'bspline'
 
-            % Define the number of polynomial pieces
-            numPieces = numKnots - 1;  % Typically numKnots should be greater than the order
+            % Define the number of polynomial pieces.
+            % Typically numKnots should be greater than the order.
+            numPieces = numKnots - 1;  
 
-            % Fit the B-spline to the data and evaluate it
+            % Fit the B-spline to the data and evaluate it.
             for i = 1:size(cashflows, 2)
                 sp = spap2(numPieces, numKnots, S(:, j+1), cashflows(:, i));
-                CVt(:, i) = fnval(sp, S(:, j+1)); % Using a temporary variable for CV
+                CVt(:, i) = fnval(sp, S(:, j+1)); % Using a temporary variable for CV.
             end
             CV = CVt';
         

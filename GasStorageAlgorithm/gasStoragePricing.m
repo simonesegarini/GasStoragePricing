@@ -38,11 +38,11 @@ paramsOUL = [0.0315, 0.05, 0]; % Parameters for the OU case, low volatility.
 paramsOUH = [0.0945, 0.05, 0]; % Parameters for the OU case, high volatility.
 
 % OU-NTS.
-paramsNTSsymm = [0.6, 0.2162, 0.201, 0.256, 0]; % Params for the OU-NTS case
-paramsNTSasymm = [0.6, 0.2162, 0.201, 0.256, 0.1]; % Params for the OU-NTS case
+paramsNTSsymm = [0.6, 0.2162, 0.201, 0.256, 0]; % Params for the OU-NTS symmetric case.
+paramsNTSasymm = [0.6, 0.2162, 0.201, 0.256, 0.1]; % Params for the OU-NTS asymmetric case.
 
 % OU-TS.
-paramsTS = [0.5, 0.1, 2.5, 3.5, 0.5, 1, 0]; % Params for the OU-TS case
+paramsTS = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0]; % Params for the OU-TS case
 
 % Number of simulations.
 numberSimulations = 500; 
@@ -53,6 +53,9 @@ N = (Vmax-Vmin)/alpha+1; % units of discretization for the volume
 dV = (Vmax:-alpha:Vmin)';
 index_V0 = find(dV == V0);
 
+% Matrices for withdraw/injection limits.
+maxWithdraw = Imin(dV*ones(1,T));
+maxInjection = Imax(dV*ones(1,T));
 
 %% Simulations with all type of processes studied in fgmc algorithm
 % Simulation of the underlying for the OU case, low volatility.
@@ -105,75 +108,117 @@ S_TS_OU = S0*exp(X_TS_OU);
 
 %% Plot to see some paths
 simulations = [1, 5, 25, 50];
+
+% OU, low and high volatilities, normal and AV
 plotSpot(simulations, S_OUL, 'OU-L', 1)
 plotSpot(simulations, S_OUH, 'OU-H', 1)
 plotSpot(simulations, SAV_OUL, 'OU-AVL', 1)
 plotSpot(simulations, SAV_OUH, 'OU-AVH', 1)
+
+% OU-NTS, symmetric and asymmetric
 plotSpot(simulations, S_OU_NTSsymm, 'OU-NTSsymm', 1)
 plotSpot(simulations, S_NTS_OUsymm, 'NTS-OUsymm', 1)
-plotSpot(simulations, S_OU_NTSsymm, 'OU-NTSasymm', 1)
-plotSpot(simulations, S_NTS_OUsymm, 'NTS-OUasymm', 1)
+
+% NTS-OU symmetric and asymmetric
+plotSpot(simulations, S_OU_NTSasymm, 'OU-NTSasymm', 1)
+plotSpot(simulations, S_NTS_OUasymm, 'NTS-OUasymm', 1)
+
+% OU-TS
 plotSpot(simulations, S_OU_TS, 'OU-TS', 1)
+
+% TS-OU
 plotSpot(simulations, S_TS_OU, 'TS-OU', 1)
 
 %% 2. ASSIGN A VALUE TO THE CONTRACT AT MATURITY
 % Assign the final penalization cost to the cashflows matrices, they have a
 % T in the end to refer as the final time step, created this variable to
 % avoid new initialization each time we want to try a different approach.
+
+% OU, low and high volatilities, normal and AV
 cashflows_OUL_T = penFunc(S_OUL(:,end), ones(numberSimulations,1)*dV');
 cashflows_OU_AVL_T = penFunc(SAV_OUL(:,end), ones(numberSimulations,1)*dV');
 cashflows_OUH_T = penFunc(S_OUH(:,end), ones(numberSimulations,1)*dV');
 cashflows_OU_AVH_T = penFunc(SAV_OUH(:,end), ones(numberSimulations,1)*dV');
+
+% OU-NTS, symmetric and asymmetric
 cashflows_OU_NTSsymm_T = penFunc(S_OU_NTSsymm(:,end), ones(numberSimulations,1)*dV');
-cashflows_NTS_OUsymm_T = penFunc(S_NTS_OUsymm(:,end), ones(numberSimulations,1)*dV');
 cashflows_OU_NTSasymm_T = penFunc(S_OU_NTSasymm(:,end), ones(numberSimulations,1)*dV');
+
+% NTS-OU symmetric and asymmetric
+cashflows_NTS_OUsymm_T = penFunc(S_NTS_OUsymm(:,end), ones(numberSimulations,1)*dV');
 cashflows_NTS_OUasymm_T = penFunc(S_NTS_OUasymm(:,end), ones(numberSimulations,1)*dV');
+
+% OU-TS
 cashflows_OU_TS_T = penFunc(S_OU_TS(:,end), ones(numberSimulations,1)*dV');
+
+% TS-OU
 cashflows_TS_OU_T = penFunc(S_TS_OU(:,end), ones(numberSimulations,1)*dV');
 
-% Matrices for withdraw/injection limits.
-maxWithdraw = Imin(dV*ones(1,T));
-maxInjection = Imax(dV*ones(1,T));
-
-%% 3. APPLY BACKWARD INDUCTION
+%% 3. APPLY BACKWARD INDUCTION WITH PRICEIN
 % Use IN-pricing to avoid using too much space for the matrices of policies
 % and for the regressors, they are needed just for plot and OUT-price
 % purpose.
+
+% OU, low and high volatilities, normal and AV
 cashflows_OUL = priceIn(S_OUL, cashflows_OUL_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 cashflows_OU_AVL = priceIn(SAV_OUL, cashflows_OU_AVL_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 cashflows_OUH = priceIn(S_OUH, cashflows_OUH_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 cashflows_OU_AVH = priceIn(SAV_OUH, cashflows_OU_AVH_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 
+% OU-NTS, symmetric and asymmetric
 cashflows_OU_NTSsymm = priceIn(S_OU_NTSsymm, cashflows_OU_NTSsymm_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
-cashflows_NTS_OUsymm = priceIn(S_NTS_OUsymm, cashflows_NTS_OUsymm_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 cashflows_OU_NTSasymm = priceIn(S_OU_NTSasymm, cashflows_OU_NTSasymm_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
+
+% NTS-OU symmetric and asymmetric
+cashflows_NTS_OUsymm = priceIn(S_NTS_OUsymm, cashflows_NTS_OUsymm_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 cashflows_NTS_OUasymm = priceIn(S_NTS_OUasymm, cashflows_NTS_OUasymm_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 
+% OU-TS
 cashflows_OU_TS = priceIn(S_OU_TS, cashflows_OU_TS_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
+
+%TS-OU
 cashflows_TS_OU = priceIn(S_TS_OU, cashflows_TS_OU_T, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
 
 %% 4. PRICE
-% Compute the final price as the mean of accumulated cash flows at t=0 across all simulations
-[price_OUL_IN, ~, price_OUL_IN_CI] = normfit(0.5*(cashflows_OUL(:,index_V0) + cashflows_OU_AVL(:,index_V0)));
-[price_OUH_IN, ~, price_OUH_IN_CI] = normfit(0.5*(cashflows_OUH(:,index_V0) + cashflows_OU_AVH(:,index_V0)));
-[price_OU_NTSsymm_IN, ~, price_OU_NTSsymm_IN_CI] = normfit(cashflows_OU_NTSsymm(:, index_V0));
-[price_NTS_OUsymm_IN, ~, price_NTS_OUsymm_IN_CI] = normfit(cashflows_NTS_OUsymm(:, index_V0));
-[price_OU_NTSasymm_IN, ~, price_OU_NTSasymm_IN_CI] = normfit(cashflows_OU_NTSasymm(:, index_V0));
-[price_NTS_OUasymm_IN, ~, price_NTS_OUasymm_IN_CI] = normfit(cashflows_NTS_OUasymm(:, index_V0));
-[price_OU_TS_IN, ~, price_OU_TS_IN_CI] = normfit(cashflows_OU_TS(:, index_V0));
-[price_TS_OU_IN, ~, price_TS_OU_IN_CI] = normfit(cashflows_TS_OU(:, index_V0));
+% Compute the final price as the mean of accumulated cash flows at t=0
+% across all simulations. We take prices and CIs from normfit while the
+% std error from the function created for this.
 
+% OU low volatility
+[price_OUL_IN, ~, price_OUL_IN_CI] = normfit(0.5*(cashflows_OUL(:,index_V0) + cashflows_OU_AVL(:,index_V0)));
 IN_OUL_STD = standardError(0.5*(cashflows_OUL(:,index_V0) + cashflows_OU_AVL(:,index_V0)));
+
+% OU high volatility
+[price_OUH_IN, ~, price_OUH_IN_CI] = normfit(0.5*(cashflows_OUH(:,index_V0) + cashflows_OU_AVH(:,index_V0)));
 IN_OUH_STD = standardError(0.5*(cashflows_OUH(:,index_V0) + cashflows_OU_AVH(:,index_V0)));
+
+% OU-NTS symmetric
+[price_OU_NTSsymm_IN, ~, price_OU_NTSsymm_IN_CI] = normfit(cashflows_OU_NTSsymm(:, index_V0));
 IN_OU_NTSsymm_STD = standardError(cashflows_OU_NTSsymm(:, index_V0));
-IN_NTS_OUsymm_STD = standardError(cashflows_NTS_OUsymm(:, index_V0));
+
+% OU-NTS asymmetric
+[price_OU_NTSasymm_IN, ~, price_OU_NTSasymm_IN_CI] = normfit(cashflows_OU_NTSasymm(:, index_V0));
 IN_OU_NTSasymm_STD = standardError(cashflows_OU_NTSasymm(:, index_V0));
+
+% NTS-OU symmetric
+[price_NTS_OUsymm_IN, ~, price_NTS_OUsymm_IN_CI] = normfit(cashflows_NTS_OUsymm(:, index_V0));
+IN_NTS_OUsymm_STD = standardError(cashflows_NTS_OUsymm(:, index_V0));
+
+% NTS-OU asymmetric
+[price_NTS_OUasymm_IN, ~, price_NTS_OUasymm_IN_CI] = normfit(cashflows_NTS_OUasymm(:, index_V0));
 IN_NTS_OUasymm_STD = standardError(cashflows_NTS_OUasymm(:, index_V0));
+
+% OU-TS
+[price_OU_TS_IN, ~, price_OU_TS_IN_CI] = normfit(cashflows_OU_TS(:, index_V0));
 IN_OU_TS_STD = standardError(cashflows_OU_TS(:, index_V0));
+
+% TS-OU
+[price_TS_OU_IN, ~, price_TS_OU_IN_CI] = normfit(cashflows_TS_OU(:, index_V0));
 IN_TS_OU_STD = standardError(cashflows_TS_OU(:, index_V0));
 
 %% Plots of distribution of storage prices
 % Plot the distribution of the IN price (save the plots if the last inputs is 1)
+
 % OU case, low volatility
 plotPriceDistribution(0.5*(cashflows_OUL(:,index_V0) + cashflows_OU_AVL(:,index_V0)), numberSimulations, 'OU-L', paramsOUL(1)*100, 1);
 
@@ -197,20 +242,3 @@ plotPriceDistribution(cashflows_OU_TS(:, index_V0), numberSimulations, 'OU-TS', 
 
 % TS-OU case
 plotPriceDistribution(cashflows_TS_OU(:, index_V0), numberSimulations, 'TS-OU', paramsTS(1), 1);
-
-%% 5. OUT PRICE, CHECK FOR CONVERGENCE OF LS
-% OUT-price, uncomment to run the backwardInduction algorithm that gives
-% the regressors and the policies, run the part of priceOut after
-% simulating the prices with another seed.
-%
-% [cashflows, policies, regression] = backwardInduction(S, cashflows, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw);
-% [cashflows_AV, policies_AV, regressionAV] = backwardInduction(SAV, cashflows_AV, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw);
-% [cashflows_OU_NTS, policies_OU_NTS, regression_OU_NTS] = backwardInduction(S_OU_NTS, cashflows_OU_NTS, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw);
-% [cashflows_NTS_OU, policies_NTS_OU, regression_NTS_OU] = backwardInduction(S_NTS_OU, cashflows_NTS_OU, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw);
-% [cashflows_OU_TS, policies_OU_TS, regression_OU_TS] = backwardInduction(S_OU_TS, cashflows_OU_TS, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw);
-% [cashflows_TS_OU, policies_TS_OU, regression_TS_OU] = backwardInduction(S_TS_OU, cashflows_TS_OU, payoff, N, numberSimulations, delta, alpha, T, maxInjection, maxWithdraw);
-
-
-% NEED POLICIES FOR THIS, RUN BACKWARDINDUCTION NOT PRICEIN!
-% %% PLOT OF THE VOLUME EVOLUTION
-% volumePlot(row_indices, T, V0, policies, alpha, vol, index_V0);

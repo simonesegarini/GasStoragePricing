@@ -1,4 +1,4 @@
-function [cashflows, policies, regressors] = backwardInduction(S, cashflows, h, N, M, delta, alpha, T, maxInjection, maxWithdraw)
+function [cashflows, policies, regressors] = backwardInduction(S, cashflows, h, N, M, delta, alpha, T, maxInjection, maxWithdraw, numKnots, method)
 % Simulation the evolution of the storage and the payoff with BW induction
 %
 % INPUT:
@@ -12,27 +12,48 @@ function [cashflows, policies, regressors] = backwardInduction(S, cashflows, h, 
 % T:                    last day of Spot trading
 % maxInjection:         matrix with max injection values for all discr volumes
 % maxWithdraw:          matrix with max withdraw values for all discr volumes
+% numKnots:             number of knots for B-spline or polynomial degree + 1 for polynomial regression
+% method:               'polynomial' or 'bspline' for regression type
 %
 % OUTPUT:
 % cashflows:            matrix with the cashflows at t0
 % policies:             3d matrix with all the policies through time
 % regressors:           regression parameters needed for OUT pricing
 
+% Parameters to give back, not given back in priceIn but useful for
+% priceOut and for plotSpot.
 policy = zeros(N, M);
 policies = zeros(T, N, M);
-regressors = zeros(4, N, T-1);
+regressors = zeros(numKnots, N, T-1);
 
+% Run the procedure with two matrices to avoid using one 3d matrix,
+% computationally more efficient and memory saving.
 temp_cf = cashflows;
 
 for j = T:-1:1 % bw iterations in time
 
-    %in j i have time T+1 but S_T, if j=1 i have t = 1 but S_0
-    A = [ones(length(S(:,j+1)),1), S(:,j+1), S(:,j+1).^2, S(:,j+1).^3]; 
+    % In j I have time T+1 but S_T, if j=1 I have t = 1 but S_0 (idxs reference).
 
-    % OLS for CV
-    b = cashflows;
-    regressors(:, :, j) = A\b;
-    CV = (A*regressors(:, :, j))';
+    % Perform regression to compute CV based on the selected method.
+    switch method
+        case 'polynomial'
+            % Create the design matrix for polynomial regression.
+            A = ones(length(S(:, j+1)), numKnots);
+            for d = 1:(numKnots - 1)
+                A(:,d+1) = S(:, j+1).^d;
+            end
+
+            % OLS for CV.
+            b = cashflows;
+            regressors(:, :, j) = A\b;
+            CV = (A*regressors(:, :, j))';
+
+        case 'bspline' 
+            error('Procedure at the moment not available, trying to fix some errors.')
+            
+        otherwise
+            error('Unknown regression method. Use "polynomial" or "bspline".')
+    end
 
     % check all the plausible deltaV and which one has the highest exp value
     for i =1:N

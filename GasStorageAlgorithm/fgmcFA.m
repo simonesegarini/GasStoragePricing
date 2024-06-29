@@ -1,10 +1,10 @@
-function increments = fgmcFA(U, params, M, dt, model, activity, toll)
-% FGMC method for Finite Activity processes
+function increments = fgmcFA(U, params, Mfft, dt, model, activity, toll).
+% FGMC method for Finite Activity processes.
 %
 % INPUT:
 % U:                    matrix with the simulated Uniform RV
 % params:               vector of paramteres for the specified model
-% M:                    parameter for FFT
+% Mfft:                 parameter for FFT
 % dt:                   time step
 % model:                model selected
 % activity:             model activity, needed for the FA case
@@ -50,5 +50,5 @@ idxs = find(Bt == 1);
 % Compute increments by calling the function for the inifinite activity
 % processes just where we have a jump.
 increments = zeros(size(U));
-increments(idxs) = fgmcIA(U(idxs), params, M, dt, model, activity, toll);
+increments(idxs) = fgmcIA(U(idxs), params, Mfft, dt, model, activity, toll);
 end

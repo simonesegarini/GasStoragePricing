@@ -1,5 +1,5 @@
 function X = fgmc(model, params, N, M, T, Mfft, seed, toll)
-% Finite General Monte Carlo algorithm for OU-Lévy and Lévy-OU processes
+% Finite General Monte Carlo algorithm for OU-Lévy and Lévy-OU processes.
 %
 % INPUT:
 % model:                char for model selection

@@ -1,5 +1,5 @@
 function increments = fgmcIA(U, params, Mfft, dt, model, activity, toll)
-% FGMC method for Infinite Activity processes
+% FGMC method for Infinite Activity processes.
 %
 % INPUT:
 % U:                    matrix with the simulated Uniform RV

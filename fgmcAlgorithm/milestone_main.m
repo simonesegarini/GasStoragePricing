@@ -8,7 +8,7 @@ warningID = 'MATLAB:legend:IgnoringExtraEntries';
 warning('off', warningID);
 
 %% SIMULATION PARAMETERS
-T = 1/12; % Time horizon
+T = 1; % Time horizon
 M = 1; % Number of steps
 N = 1e7; % Number of simulations
 seed = 2; % Seed for the random uniform sampling

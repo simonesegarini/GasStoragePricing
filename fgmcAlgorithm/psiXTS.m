@@ -1,4 +1,4 @@
-function values = phiXTS(us, params)
+function values = psiXTS(us, params)
 % Used as auxiliary function to compute the CF of a TS-OU process. The CF
 % is the difference of the CF of this function with different inputs.
 %

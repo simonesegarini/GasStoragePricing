@@ -1,6 +1,6 @@
-function cashflows = priceOut(S, cashflows, betas, h, N, M, delta, alpha, T, maxInjection, maxWithdraw)
+function cashflows = priceOut(S, cashflows, betas, h, N, M, delta, alpha, T, maxInjection, maxWithdraw, numKnots, method)
 % Compute the price with the OUT method by using the regression
-% coefficients computed in the IN methodology
+% coefficients computed in the IN methodology.
 %
 % INPUT:
 % S:                    simulations of Spot
@@ -24,9 +24,27 @@ temp_cf = cashflows;
 
 for j = T:-1:1 % bw iterations in time
 
-    % In j i have time T+1 but S_T, if j=1 i have t = 1 but S_0 (idxs reference).
-    A = [ones(length(S(:,j+1)),1), S(:,j+1), S(:,j+1).^2, S(:,j+1).^3]; 
-    CV = (A*betas(:,:,j))';
+    % In j I have time T+1 but S_T, if j=1 I have t = 1 but S_0 (idxs reference).
+
+    % Perform regression to compute CV based on the selected method.
+    switch method
+        case 'polynomial'
+            % Create the design matrix for polynomial regression.
+            A = ones(length(S(:, j+1)), numKnots);
+            for d = 1:(numKnots - 1)
+                A(:,d+1) = S(:, j+1).^d;
+            end
+            
+            CV = (A*betas(:,:,j))';
+
+        case 'bspline'
+            error('Procedure at the moment not available, trying to fix some errors.')
+            % A = spcol(1, numKnots, S(:, j+1));
+            % CV = (A*betas(:, :, j))';
+            
+        otherwise
+            error('Unknown regression method. Use "polynomial" or "bspline".')
+    end
 
     % Check all the plausible deltaV and which one has the highest exp value.
     for i =1:N

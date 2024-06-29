@@ -1,4 +1,4 @@
-function values = phiXNTS(us, params)
+function values = psiXNTS(us, params)
 % Used as auxiliary function to compute the CF of a NTS-OU process. The CF
 % is the difference of the CF of this function with different inputs.
 %
@@ -14,6 +14,13 @@ alpha = params(1); sigma = params(3);
 k = params(4); theta = params(5);
 
 % Evaluate the NTS process.
-values = (1-alpha)/(k*alpha)*(1 - (1 - 1i.*k/(1-alpha)*(theta.*us + 1i.*us.^2.*sigma^2/2)).^alpha);
 
+% General case.
+if alpha ~= 0
+    values = (1-alpha)/(k*alpha)*(1 - (1 - 1i.*k/(1-alpha)*(theta.*us + 1i.*us.^2.*sigma^2/2)).^alpha);
+
+% Variance Gamma
+elseif alpha == 0
+    values = -1/k.*log(0.5*sigma^2.*us.^2.*k - 1i*theta*k.*us + 1);
+end
 end
