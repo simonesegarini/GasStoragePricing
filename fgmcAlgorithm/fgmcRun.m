@@ -1,4 +1,4 @@
-%% MILESTONE 1 - IMPLEMENTATION OF BAVIERA MANZONI 2024 PAPER
+%% fgmc - IMPLEMENTATION OF BAVIERA MANZONI 2024 PAPER
 clear all, close all, clc
 
 % Turn off the warning for extra legend entries, just to avoid messages
@@ -21,6 +21,7 @@ b = 0.2162; sigma = 0.201; k = 0.256; theta = 0;
 
 TCumulantsOUNTSalphaSymm = zeros(numel(alphas), 4);
 ECumulantsOUNTSalphaSymm = zeros(numel(alphas), 4);
+timeOUNTSalphaSymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     Xt = fgmc('OU-NTS', [alphas(i), b, sigma, k, theta], N, M, T, 16, seed, 1e-8);
@@ -33,6 +34,7 @@ b = 0.2162; sigma = 0.201; k = 0.256; theta = 0.1;
 
 TCumulantsOUNTSalphaAsymm = zeros(numel(alphas), 4);
 ECumulantsOUNTSalphaAsymm = zeros(numel(alphas), 4);
+timeOUNTSalphaAsymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     Xt = fgmc('OU-NTS', [alphas(i), b, sigma, k, theta], N, M, T, 16, seed, 1e-8);
@@ -45,6 +47,7 @@ b = 0.2162; sigma = 0.201; k = 0.256; theta = 0;
 
 TCumulantsNTSOUalphaSymm = zeros(numel(alphas), 4);
 ECumulantsNTSOUalphaSymm = zeros(numel(alphas), 4);
+timeNTSOUalphaSymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     Xt = fgmc('NTS-OU', [alphas(i), b, sigma, k, theta], N, M, T, 24, seed, 1e-10);
@@ -57,6 +60,7 @@ b = 0.2162; sigma = 0.201; k = 0.256; theta = 0.1;
 
 TCumulantsNTSOUalphaAsymm = zeros(numel(alphas), 4);
 ECumulantsNTSOUalphaAsymm = zeros(numel(alphas), 4);
+timeNTSOUalphaAsymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     Xt = fgmc('NTS-OU', [alphas(i), b, sigma, k, theta], N, M, T, 24, seed, 1e-10);
@@ -69,6 +73,7 @@ b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 TCumulantsOUTSalpha = zeros(numel(alphas), 4);
 ECumulantsOUTSalpha = zeros(numel(alphas), 4);
+timeOUTSalpha = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     Xt= fgmc('OU-TS', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 18, seed, 1e-10);
@@ -81,6 +86,7 @@ b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 TCumulantsTSOUalpha = zeros(numel(alphas), 4);
 ECumulantsTSOUalpha = zeros(numel(alphas), 4);
+timeTSOUalpha = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     Xt= fgmc('TS-OU', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 25, seed, 1e-12);
