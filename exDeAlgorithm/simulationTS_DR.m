@@ -11,7 +11,7 @@ function TSrv = simulationTS_DR(alpha, lambda, theta, nSim)
 % OUTPUT:
 % TSrv:                 TS simulated variables
 
-lambda = lambda.*theta.^(1/alpha);
+%lambda = lambda.*theta.^(1/alpha);
 
 % Set up the parameters from Devroye 2009.
 gamma = lambda^alpha * alpha * (1-alpha);
@@ -151,5 +151,5 @@ while sum(accepted_outer) < nSim
 
 end
 
-TSrv = 1./(X.^b) .* theta.^(1/alpha);
+TSrv = 1./(X.^b) .* theta;%.^(1/alpha);
 end

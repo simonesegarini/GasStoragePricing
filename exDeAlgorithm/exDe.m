@@ -14,7 +14,6 @@ function X = exDe(model, params, N, M, T, seed)
 % OUTPUT:
 % X:                    logprices
 
-
 % Parameters for the discretization.
 dt = T/M;
 alpha = params(1); b = params(2);
@@ -49,12 +48,13 @@ switch model
 end
 
 % Iteration in discretized time to update the simulations.
-for j = 1:M
-    % Compute Zt based on the type of process.
-    if strcmp(activity, 'Infinite')
+% Compute Zt based on the type of process.
+if strcmp(activity, 'Infinite')
+    for j = 1:M
         X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeIA(params, dt, N, model);
-        
-    elseif strcmp(activity, 'Finite')
+    end       
+elseif strcmp(activity, 'Finite')
+    for j = 1:M
         X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeFA(params, dt, N, model);
     end
 end

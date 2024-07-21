@@ -1,5 +1,5 @@
 function X = fgmc(model, params, N, M, T, Mfft, seed, toll)
-% Finite General Monte Carlo algorithm for OU-Lévy processes.
+% Finite General Monte Carlo algorithm for OU-Lévy and Lévy-OU processes.
 %
 % INPUT:
 % model:                char for model selection
@@ -48,14 +48,18 @@ switch model
 end
 
 % Iteration in discretized time to update the simulations.
+
+% Create approximated CDF.
+[xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, toll);
+
 % Compute Zt based on the type of process.
 if strcmp(activity, 'Infinite')
     for j = 1:M
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(U(:,j), params, Mfft, dt, model, activity, toll);
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j));
     end
 elseif strcmp(activity, 'Finite')
     for j = 1:M
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcFA(U(:,j), params, Mfft, dt, model, activity, toll);
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcFA(xgrid_hat, CDF_hat, U(:,j), dt, params, model);
     end
 end
 

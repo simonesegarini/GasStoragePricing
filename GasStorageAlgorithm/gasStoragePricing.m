@@ -38,8 +38,8 @@ paramsOUL = [0.0315, 0.05, 0]; % Parameters for the OU case, low volatility.
 paramsOUH = [0.0945, 0.05, 0]; % Parameters for the OU case, high volatility.
 
 % OU-NTS.
-paramsNTSsymm = [0.6, 0.2162, 0.201, 0.256, 0]; % Params for the OU-NTS symmetric case.
-paramsNTSasymm = [0.6, 0.2162, 0.201, 0.256, 0.1]; % Params for the OU-NTS asymmetric case.
+paramsNTSsymm = [0.7, 0.2162, 0.201, 0.256, 0]; % Params for the OU-NTS symmetric case.
+paramsNTSasymm = [0.7, 0.2162, 0.201, 0.256, 0.1]; % Params for the OU-NTS asymmetric case.
 
 % OU-TS.
 paramsTS = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0]; % Params for the OU-TS case
@@ -96,13 +96,13 @@ S_NTS_OUasymm = S0*exp(X_NTS_OUasymm);
 
 % Simulation of the underlying for the OU-TS case.
 tic
-X_OU_TS = spotSimulation('OU-TS', paramsTS, numberSimulations, 365, T, 18, seed, 1e-10, 'exde');
+X_OU_TS = spotSimulation('OU-TS', paramsTS, numberSimulations, 365, T, 18, seed, 1e-10, 'fgmc');
 timeOU_TS = toc;
 S_OU_TS = S0*exp(X_OU_TS);
 
 % Simulation of the underlying for the TS-OU case.
 tic
-X_TS_OU = spotSimulation('TS-OU', paramsTS, numberSimulations, 365, T, 25, seed, 1e-12, 'exde');
+X_TS_OU = spotSimulation('TS-OU', paramsTS, numberSimulations, 365, T, 25, seed, 1e-12, 'fgmc');
 timeTS_OU = toc;
 S_TS_OU = S0*exp(X_TS_OU);
 
@@ -110,24 +110,24 @@ S_TS_OU = S0*exp(X_TS_OU);
 simulations = [1, 5, 25, 50];
 
 % OU, low and high volatilities, normal and AV
-plotSpot(simulations, S_OUL, 'OU-L', 1)
-plotSpot(simulations, S_OUH, 'OU-H', 1)
-plotSpot(simulations, SAV_OUL, 'OU-AVL', 1)
-plotSpot(simulations, SAV_OUH, 'OU-AVH', 1)
+plotSpot(simulations, S_OUL, 'OU-L', 0)
+plotSpot(simulations, S_OUH, 'OU-H', 0)
+plotSpot(simulations, SAV_OUL, 'OU-AVL', 0)
+plotSpot(simulations, SAV_OUH, 'OU-AVH', 0)
 
 % OU-NTS, symmetric and asymmetric
-plotSpot(simulations, S_OU_NTSsymm, 'OU-NTSsymm', 1)
-plotSpot(simulations, S_NTS_OUsymm, 'NTS-OUsymm', 1)
+plotSpot(simulations, S_OU_NTSsymm, 'OU-NTSsymm', 0)
+plotSpot(simulations, S_OU_NTSasymm, 'OU-NTSasymm', 0)
 
 % NTS-OU symmetric and asymmetric
-plotSpot(simulations, S_OU_NTSasymm, 'OU-NTSasymm', 1)
-plotSpot(simulations, S_NTS_OUasymm, 'NTS-OUasymm', 1)
+plotSpot(simulations, S_NTS_OUsymm, 'NTS-OUsymm', 0)
+plotSpot(simulations, S_NTS_OUasymm, 'NTS-OUasymm', 0)
 
 % OU-TS
-plotSpot(simulations, S_OU_TS, 'OU-TS', 1)
+plotSpot(simulations, S_OU_TS, 'OU-TS', 0)
 
 % TS-OU
-plotSpot(simulations, S_TS_OU, 'TS-OU', 1)
+plotSpot(simulations, S_TS_OU, 'TS-OU', 0)
 
 %% 2. ASSIGN A VALUE TO THE CONTRACT AT MATURITY
 % Assign the final penalization cost to the cashflows matrices, they have a
@@ -220,25 +220,27 @@ IN_TS_OU_STD = standardError(cashflows_TS_OU(:, index_V0));
 % Plot the distribution of the IN price (save the plots if the last inputs is 1)
 
 % OU case, low volatility
-plotPriceDistribution(0.5*(cashflows_OUL(:,index_V0) + cashflows_OU_AVL(:,index_V0)), numberSimulations, 'OU-L', paramsOUL(1)*100, 1);
+plotPriceDistribution(0.5*(cashflows_OUL(:,index_V0) + cashflows_OU_AVL(:,index_V0)), numberSimulations, 'OU-L', paramsOUL(1)*100, 0);
 
 % OU case, high volatility
-plotPriceDistribution(0.5*(cashflows_OUH(:,index_V0) + cashflows_OU_AVH(:,index_V0)), numberSimulations, 'OU-H', paramsOUH(1)*100, 1);
+plotPriceDistribution(0.5*(cashflows_OUH(:,index_V0) + cashflows_OU_AVH(:,index_V0)), numberSimulations, 'OU-H', paramsOUH(1)*100, 0);
 
 % OU-NTS symmetric case
-plotPriceDistribution(cashflows_OU_NTSsymm(:, index_V0), numberSimulations, 'OU-NTSsymm', paramsNTSsymm(1), 1);
+plotPriceDistribution(cashflows_OU_NTSsymm(:, index_V0), numberSimulations, 'OU-NTSsymm', paramsNTSsymm(1), 0);
 
 % OU-NTS asymmetric case
-plotPriceDistribution(cashflows_OU_NTSasymm(:, index_V0), numberSimulations, 'OU-NTSasymm', paramsNTSasymm(1), 1);
+plotPriceDistribution(cashflows_OU_NTSasymm(:, index_V0), numberSimulations, 'OU-NTSasymm', paramsNTSasymm(1), 0);
 
 % NTS-OU symmetric case
-plotPriceDistribution(cashflows_NTS_OUsymm(:, index_V0), numberSimulations, 'NTS-OUsymm', paramsNTSsymm(1), 1);
+plotPriceDistribution(cashflows_NTS_OUsymm(:, index_V0), numberSimulations, 'NTS-OUsymm', paramsNTSsymm(1), 0);
 
 % NTS-OU asymmetric case
-plotPriceDistribution(cashflows_NTS_OUasymm(:, index_V0), numberSimulations, 'NTS-OUasymm', paramsNTSasymm(1), 1);
+plotPriceDistribution(cashflows_NTS_OUasymm(:, index_V0), numberSimulations, 'NTS-OUasymm', paramsNTSasymm(1), 0);
 
+% Note: for this cases it might be useful to remove the maximum value of
+% the price vector in order to obtain graphs that are more readable.
 % OU-TS case
-plotPriceDistribution(cashflows_OU_TS(:, index_V0), numberSimulations, 'OU-TS', paramsTS(1), 1);
+plotPriceDistribution(cashflows_OU_TS(:, index_V0), numberSimulations, 'OU-TS', paramsTS(1), 0);
 
 % TS-OU case
-plotPriceDistribution(cashflows_TS_OU(:, index_V0), numberSimulations, 'TS-OU', paramsTS(1), 1);
+plotPriceDistribution(cashflows_TS_OU(:, index_V0), numberSimulations, 'TS-OU', paramsTS(1), 0);

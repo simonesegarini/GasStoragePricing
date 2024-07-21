@@ -8,7 +8,7 @@ warningID = 'MATLAB:legend:IgnoringExtraEntries';
 warning('off', warningID);
 
 %% SIMULATION PARAMETERS
-T = 1; % Time horizon
+T = 1/12; % Time horizon
 M = 1; % Number of steps
 N = 1e7; % Number of simulations
 seed = 2; % Seed for the random uniform sampling
@@ -24,7 +24,9 @@ ECumulantsOUNTSalphaSymm = zeros(numel(alphas), 4);
 timeOUNTSalphaSymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
+    tic
     Xt = fgmc('OU-NTS', [alphas(i), b, sigma, k, theta], N, M, T, 16, seed, 1e-8);
+    timeOUNTSalphaSymm(i) = toc;
     [TCumulantsOUNTSalphaSymm(i,:), ECumulantsOUNTSalphaSymm(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, sigma, k, theta], T, 'OU-NTS');
 end
 
@@ -37,7 +39,9 @@ ECumulantsOUNTSalphaAsymm = zeros(numel(alphas), 4);
 timeOUNTSalphaAsymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
-    Xt = fgmc('OU-NTS', [alphas(i), b, sigma, k, theta], N, M, T, 16, seed, 1e-8);
+    tic
+    Xt = fgmc('OU-NTS', [alphas(i), b, sigma, k, theta], N, M, T, 17, seed, 1e-8);
+    timeOUNTSalphaAsymm(i) = toc;
     [TCumulantsOUNTSalphaAsymm(i,:), ECumulantsOUNTSalphaAsymm(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, sigma, k, theta], T, 'OU-NTS');
 end
 
@@ -50,7 +54,9 @@ ECumulantsNTSOUalphaSymm = zeros(numel(alphas), 4);
 timeNTSOUalphaSymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
+    tic
     Xt = fgmc('NTS-OU', [alphas(i), b, sigma, k, theta], N, M, T, 24, seed, 1e-10);
+    timeNTSOUalphaSymm(i) = toc;
     [TCumulantsNTSOUalphaSymm(i,:), ECumulantsNTSOUalphaSymm(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, sigma, k, theta], T, 'NTS-OU');
 end
 
@@ -63,12 +69,15 @@ ECumulantsNTSOUalphaAsymm = zeros(numel(alphas), 4);
 timeNTSOUalphaAsymm = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
+    tic
     Xt = fgmc('NTS-OU', [alphas(i), b, sigma, k, theta], N, M, T, 24, seed, 1e-10);
+    timeNTSOUalphaAsymm(i) = toc;
     [TCumulantsNTSOUalphaAsymm(i,:), ECumulantsNTSOUalphaAsymm(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, sigma, k, theta], T, 'NTS-OU');
 end
 
 %% OU-TS VARYING ALPHA
-alphas = [1.6, 1.2, 0.8, 0.4, -1.0, -2.0];
+%alphas = [1.6, 1.2, 0.8, 0.4, -1.0, -2.0];
+alphas = [-1.0, -2.0];
 b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 TCumulantsOUTSalpha = zeros(numel(alphas), 4);
@@ -76,7 +85,9 @@ ECumulantsOUTSalpha = zeros(numel(alphas), 4);
 timeOUTSalpha = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
+    tic
     Xt= fgmc('OU-TS', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 18, seed, 1e-10);
+    timeOUTSalpha(i) = toc;
     [TCumulantsOUTSalpha(i,:), ECumulantsOUTSalpha(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS');
 end
 
@@ -89,7 +100,9 @@ ECumulantsTSOUalpha = zeros(numel(alphas), 4);
 timeTSOUalpha = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
+    tic
     Xt= fgmc('TS-OU', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, 25, seed, 1e-12);
+    timeTSOUalpha(i) = toc;
     [TCumulantsTSOUalpha(i,:), ECumulantsTSOUalpha(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU');
 end
 

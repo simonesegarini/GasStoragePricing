@@ -8,16 +8,15 @@ function [du, a] = extraParamsComputation(model, activity, params, N, dt)
 % exponential decay. Special cases are commented.
 %
 % INPUT:
-% U:                    matrix with the simulated Uniform RV
-% params:               vector of paramteres for the specified model
-% M:                    parameter for FFT
-% dt:                   time step
 % model:                model selected
 % activity:             model activity, needed for the FA case
-% toll:                 tollerance for CDF selection
+% params:               vector of paramteres for the specified model
+% N:                    FFT parameter, 2^M
+% dt:                   time step
 %
 % OUTPUT:
-% increment:            Z_deltaTj, stochastic increment for OU-Levy
+% du:                   discretization for the FFT algorithm
+% a:                    shift for the integral for CDF reconstruction
 
 alpha = params(1); b = params(2);
 

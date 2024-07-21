@@ -48,13 +48,18 @@ switch model
 end
 
 % Iteration in discretized time to update the simulations.
-for j = 1:M
-    % Compute Zt based on the type of process.
-    if strcmp(activity, 'Infinite')
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(U(:,j), params, Mfft, dt, model, activity, toll);
-        
-    elseif strcmp(activity, 'Finite')
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcFA(U(:,j), params, Mfft, dt, model, activity, toll);
+
+% Create approximated CDF.
+[xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, toll);
+
+% Compute Zt based on the type of process.
+if strcmp(activity, 'Infinite')
+    for j = 1:M
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j));
+    end
+elseif strcmp(activity, 'Finite')
+    for j = 1:M
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcFA(xgrid_hat, CDF_hat, U(:,j), dt, params, model);
     end
 end
 

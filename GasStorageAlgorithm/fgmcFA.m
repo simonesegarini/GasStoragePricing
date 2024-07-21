@@ -1,4 +1,4 @@
-function increments = fgmcFA(U, params, Mfft, dt, model, activity, toll).
+function increments = fgmcFA(xgrid_hat, CDF_hat, U, dt, params, model)
 % FGMC method for Finite Activity processes.
 %
 % INPUT:
@@ -28,8 +28,8 @@ switch model
 
         lamb = 2*b/k;
     case 'OU-TS'
-        alpha = params(1); beta_p = params(3);
-        beta_n = params(4); c_p = params(5); c_n = params(6);
+        alpha = params(1); b = params(2); beta_p = params(3); 
+        beta_n = params(4); c_p = params(5); c_n = params(6); gamma_c = params(7);
     
         lamb_p = c_p*beta_p^alpha*gamma(-alpha);
         lamb_n = c_n*beta_n^alpha*gamma(-alpha);
@@ -50,5 +50,5 @@ idxs = find(Bt == 1);
 % Compute increments by calling the function for the inifinite activity
 % processes just where we have a jump.
 increments = zeros(size(U));
-increments(idxs) = fgmcIA(U(idxs), params, Mfft, dt, model, activity, toll);
+increments(idxs) = fgmcIA(xgrid_hat, CDF_hat, U(idxs));
 end
