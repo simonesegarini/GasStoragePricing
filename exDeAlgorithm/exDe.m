@@ -19,6 +19,10 @@ function X = exDe(model, params, N, M, T, seed)
 dt = T/M;
 alpha = params(1); b = params(2);
 
+% Set seed for reprudicibility.
+if nargin == 6
+    rng(seed);
+end
 X = zeros(N,M+1);
 
 % Check if the model has finite/infinite activity and finite/infinite
@@ -48,10 +52,10 @@ end
 for j = 1:M
     % Compute Zt based on the type of process.
     if strcmp(activity, 'Infinite')
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeIA(params, dt, N, model, seed);
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeIA(params, dt, N, model);
         
     elseif strcmp(activity, 'Finite')
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeFA(params, dt, N, model, seed);
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeFA(params, dt, N, model);
     end
 end
 

@@ -34,8 +34,8 @@ S0 = 14.88;
 seed = 2;
 
 % Parameters.
-paramsNTSsymm = [0.6, 0.2162, 0.201, 0.256, 0]; % Params for the OU-NTS symmetric case.
-paramsNTSasymm = [0.6, 0.2162, 0.201, 0.256, 0.1]; % Params for the OU-NTS asymmetric case.
+% OU-TS.
+paramsTS = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0]; % Params for the OU-TS case
 
 % Number of simulations.
 numberSimulations = [50, 500, 5000]; 
@@ -55,42 +55,28 @@ type = ["polynomial", "polynomial", "polynomial", "bspline", "bspline"];
 order = [3,4,5,5,6];
 
 % Define variables to store data needed for comparison.
-meansSym = zeros(numel(order), numel(numberSimulations));
-stdErrorsSym = zeros(numel(order), numel(numberSimulations));
-timesSym = zeros(numel(order), numel(numberSimulations));
-CIsSym = zeros(numel(order), numel(numberSimulations), 2);
-
-meansAsym = zeros(numel(order), numel(numberSimulations));
-stdErrorsAsym = zeros(numel(order), numel(numberSimulations));
-timesAsym = zeros(numel(order), numel(numberSimulations));
-CIsAsym = zeros(numel(order), numel(numberSimulations), 2);
+means = zeros(numel(order), numel(numberSimulations));
+stdErrors = zeros(numel(order), numel(numberSimulations));
+times = zeros(numel(order), numel(numberSimulations));
+CIs = zeros(numel(order), numel(numberSimulations), 2);
 
 
 for simIt=1:numel(numberSimulations)
     
     
-    Xsym = spotSimulation('NTS-OU', paramsNTSsymm, numberSimulations(simIt), 365, T, 24, seed, 1e-10);
-    Ssym = S0*exp(Xsym);
-    Xasym = spotSimulation('NTS-OU', paramsNTSasymm, numberSimulations(simIt), 365, T, 24, seed, 1e-10);
-    Sasym = S0*exp(Xasym);
+    X = spotSimulation('OU-TS', paramsTS, numberSimulations(simIt), 365, T, 24, seed, 1e-10, 'exde');
+    S = S0*exp(X);
 
     for regIt=1:numel(order)
-        cashflowsSym = penFunc(Ssym(:,end), ones(numberSimulations(simIt),1)*dV');
-        cashflowsAsym = penFunc(Sasym(:,end), ones(numberSimulations(simIt),1)*dV');
+        cashflowsSym = penFunc(S(:,end), ones(numberSimulations(simIt),1)*dV');
         
         tic
-        cashflowsSym = priceIn(Ssym, cashflowsSym, payoff, N, numberSimulations(simIt), delta, alpha, T, maxInjection, maxWithdraw, order(regIt), type(regIt));
-        timesSym(regIt, simIt) = toc;
-
-        tic
-        cashflowsAsym = priceIn(Sasym, cashflowsAsym, payoff, N, numberSimulations(simIt), delta, alpha, T, maxInjection, maxWithdraw, order(regIt), type(regIt));
-        timesAsym(regIt, simIt) = toc;
+        cashflowsSym = priceIn(S, cashflowsSym, payoff, N, numberSimulations(simIt), delta, alpha, T, maxInjection, maxWithdraw, order(regIt), type(regIt));
+        times(regIt, simIt) = toc;
     
-        [meansSym(regIt, simIt), ~, CIsSym(regIt, simIt, :)] = normfit(cashflowsSym(:,index_V0));
-        stdErrorsSym(regIt, simIt) = standardError(cashflowsSym(:,index_V0));
+        [means(regIt, simIt), ~, CIs(regIt, simIt, :)] = normfit(cashflowsSym(:,index_V0));
+        stdErrors(regIt, simIt) = standardError(cashflowsSym(:,index_V0));
 
-        [meansAsym(regIt, simIt), ~, CIsAsym(regIt, simIt, :)] = normfit(cashflowsAsym(:,index_V0));
-        stdErrorsAsym(regIt, simIt) = standardError(cashflowsAsym(:,index_V0));
 
     end
 end

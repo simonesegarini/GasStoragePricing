@@ -8,7 +8,7 @@ N = 1e7; % Number of simulations
 seed = 2; % Seed for the random sampling
 
 %% OU-TS VARYING ALPHA
-alphas = [0.8, 0.6, 0.4, 0.2, -1.0, -2.0];
+alphas = [0.8, 0.4, -1.0, -2.0];
 b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 TCumulantsOUTSalpha = zeros(numel(alphas), 4);
@@ -23,9 +23,7 @@ for i=1:numel(alphas)
 end
 
 %% TS-OU VARYING ALPHA
-%alphas = [0.8, 0.6, 0.4, 0.2, -1.0, -2.0];
-%alphas = [0.8, 0.6, 0.4, 0.2];
-alphas = [-1.0, -2.0];
+alphas = [0.8, 0.4];
 b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 TCumulantsTSOUalpha = zeros(numel(alphas), 4);
@@ -40,9 +38,17 @@ for i=1:numel(alphas)
 end
 
 %% OU-TS
-alpha = 0.5; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
+alpha = 0.7; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 tic
 Xt = exDe('OU-TS', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed);
 timeOUTS = toc;
 [TCumulantsOUTS, ECumulantsOUTS] = computeCumulants(Xt(:,end), [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS')
+
+%% TS-OU
+alpha = 0.7; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
+
+tic
+Xt = exDe('TS-OU', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed);
+timeTSOU = toc;
+[TCumulantsTSOU, ECumulantsTSOU] = computeCumulants(Xt(:,end), [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU')

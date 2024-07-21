@@ -48,12 +48,13 @@ switch model
 end
 
 % Iteration in discretized time to update the simulations.
-for j = 1:M
-    % Compute Zt based on the type of process
-    if strcmp(activity, 'Infinite')
+% Compute Zt based on the type of process.
+if strcmp(activity, 'Infinite')
+    for j = 1:M
         X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(U(:,j), params, Mfft, dt, model, activity, toll);
-
-    elseif strcmp(activity, 'Finite')
+    end
+elseif strcmp(activity, 'Finite')
+    for j = 1:M
         X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcFA(U(:,j), params, Mfft, dt, model, activity, toll);
     end
 end

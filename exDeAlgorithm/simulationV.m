@@ -27,23 +27,22 @@ pls_cum = cumsum(pls);
 
 for it = 1:length(Vs)
 
-    acceptance = false;
-    % check better this part
-    while ~acceptance
+    accepted = false;
+    
+    % Acceptance/rejection method.
+    while ~accepted
         
         s = find(pls_cum > rand(1), 1, 'first');
 
-        coeff_ang = (fW_evaluated(s+1) - fW_evaluated(s)) / (ws(s+1) - ws(s));
+        rho = (fW_evaluated(s+1) - fW_evaluated(s)) / (ws(s+1) - ws(s));
 
-        y = ws(s) - fW_evaluated(s) / coeff_ang + ...
-            sqrt(fW_evaluated(s)^2 / coeff_ang^2 + 2 / coeff_ang * qls(s) * rand(1));
-
-        u = rand(1);
+        y = ws(s) - fW_evaluated(s) / rho + ...
+            sqrt(fW_evaluated(s)^2 / rho^2 + 2 / rho * qls(s) * rand(1));
 
         fw_y = fW(y);
-        gl_y = (coeff_ang * (y-ws(s))) + fW_evaluated(s);
+        gl_y = (rho * (y-ws(s))) + fW_evaluated(s);
 
-        acceptance = (u <= (fw_y/gl_y));
+        accepted = (rand(1) <= (fw_y/gl_y));
     end
 
     Vs(it) = a^(-y);

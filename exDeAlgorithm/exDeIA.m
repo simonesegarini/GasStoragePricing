@@ -1,5 +1,5 @@
-function increments = exDeIA(params, dt, nSim, model, seed)
-% Compute the increments for OU-TS and TS-OU processes following Algorithm
+function increments = exDeIA(params, dt, nSim, model)
+% Compute the increments for TS-OU and OU-TS processes following Algorithm
 % 1 and Algorithm 2 of Sabino & Cufaro Petroni 2022.
 %
 % INPUT:
@@ -12,17 +12,12 @@ function increments = exDeIA(params, dt, nSim, model, seed)
 % OUTPUT:
 % increments:           increments using exact decomposition method
 
-% Check if there is a given seed for reproducibility.
-if nargin == 5
-    rng(seed)
-end
-
 % Assign parameters.
 alpha = params(1); b = params(2); beta_p = params(3);
 beta_n = params(4); c_p = params(5); c_n = params(6);
 gamma_c = params(7);
 
-% As exDe algortihm of Sabino & Cufaro Petroni, we decompose 
+% As exDe Algortihm of Sabino & Cufaro Petroni, we decompose 
 % X(t) = aX0 + X1 + X2.
 % aX0 is already computed in the update rule of exDe.
 
@@ -35,13 +30,29 @@ switch model
         lamb_n = c_n*beta_n^alpha*gamma(1-alpha) * (1 - a^alpha + a^alpha * log(a^alpha)) / (b*alpha^2 * a^alpha);
         
         % Compute X1 by doing a TS simulations.
-        X1p = simulationTS(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
-        X1n = simulationTS(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
+        X1p_DR = simulationTS_DR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
+        X1n_DR = simulationTS_DR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
+        X1p = simulationTS_SSR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
+        X1n = simulationTS_SSR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
+
+        figure
+        subplot(1,2,1)
+        plot(X1p_DR, '.r')
+        title('DR method, prositive TS')
+        subplot(1,2,2)
+        plot(X1p, '.b')
+        title('SSR method, prositive TS')
+
+        figure
+        subplot(1,2,1)
+        histogram(X1p_DR, 'Normalization', 'pdf')
+        title('DR method, prositive TS')
+        subplot(1,2,2)
+        histogram(X1p, 'Normalization', 'pdf')
+        title('SSR method, prositive TS')
 
         % Cumulants to compensate.
-        cumulants_p = ctsCumulants(0, alpha, beta_p, c_p, dt, b, 3);
-        cumulants_n = ctsCumulants(0, alpha, beta_n, c_n, dt, b, 3);
-
+        ctsCumulants = computeCumulants(0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], dt, 'OU-CTS')/1000;
 
     case 'TS-OU'
         % Compute parameters for the poisson rv.
@@ -49,12 +60,11 @@ switch model
         lamb_n = c_n*gamma(1-alpha)*beta_n^alpha/alpha * (1 - a^alpha);
 
         % Compute X1 by doing a TS simulations.
-        X1p = simulationTS(alpha, beta_p, c_p*(1-a^alpha), nSim);
-        X1n = simulationTS(alpha, beta_n, c_n*(1-a^alpha), nSim);
+        X1p = simulationTS_SSR(alpha, beta_p, c_p*(1-a^alpha), nSim);
+        X1n = simulationTS_SSR(alpha, beta_n, c_n*(1-a^alpha), nSim);
 
         % Cumulants to compensate.
-        cumulants_p = ctsCumulants(0, alpha, beta_p, c_p, dt, b, 2);
-        cumulants_n = ctsCumulants(0, alpha, beta_n, c_n, dt, b, 2);
+        ctsCumulants = computeCumulants(0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], dt, 'CTS-OU')/1000;
 end
 
 % Compute X2 as a compound poisson processes.
@@ -93,19 +103,6 @@ switch model
         Vn = (1 + (a^(-alpha) - 1)./(alpha) .* Usn).^(1/alpha);
 end
 
-%to check
-
-% % Use arrayfun to apply the simulation function over the entire range
-% Vp = arrayfun(@(x) simulationV(params, dt, nSim), 1:nP, 'UniformOutput', false);
-% Vp = horzcat(Vp{:});
-% 
-% Vn = arrayfun(@(x) simulationV(params, dt, nSim), 1:nN, 'UniformOutput', false);
-% Vn = horzcat(Vn{:});
-% 
-% % Ensure that Vp and Vn are correctly sized (in case simulationV returns more data)
-% Vp = Vp(:, 1:nP);
-% Vn = Vn(:, 1:nN);
-
 % Adjust the values of beta_p and beta_n.
 beta_p_hat = beta_p*Vp;
 beta_n_hat = beta_n*Vn;
@@ -132,5 +129,5 @@ for simIt = 1:nSim
 end
 
 % Compute the total increment as return value.
-increments = gamma_c*dt + X1p + X2p - X1n - X2n - cumulants_p(1) + cumulants_n(1);
+increments = gamma_c*dt + X1p_DR + X2p - X1n_DR - X2n - ctsCumulants(1);
 end

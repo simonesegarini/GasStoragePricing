@@ -96,13 +96,13 @@ S_NTS_OUasymm = S0*exp(X_NTS_OUasymm);
 
 % Simulation of the underlying for the OU-TS case.
 tic
-X_OU_TS = spotSimulation('OU-TS', paramsTS, numberSimulations, 365, T, 18, seed, 1e-10);
+X_OU_TS = spotSimulation('OU-TS', paramsTS, numberSimulations, 365, T, 18, seed, 1e-10, 'exde');
 timeOU_TS = toc;
 S_OU_TS = S0*exp(X_OU_TS);
 
 % Simulation of the underlying for the TS-OU case.
 tic
-X_TS_OU = spotSimulation('TS-OU', paramsTS, numberSimulations, 365, T, 25, seed, 1e-12);
+X_TS_OU = spotSimulation('TS-OU', paramsTS, numberSimulations, 365, T, 25, seed, 1e-12, 'exde');
 timeTS_OU = toc;
 S_TS_OU = S0*exp(X_TS_OU);
 

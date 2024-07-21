@@ -84,5 +84,24 @@ switch model
                 TCumulants(j) = (1 - exp(-j * b * T)) * TCumulants(j) * 1000;
             end
         end
+    case {'OU-CTS', 'CTS-OU'}
+        % This case is used to compensate the first moment of the OU-CTS
+        % and CTS-OU simulations used in the ExDe Algorithm, to be coherent
+        % with FGMC Algorithm.
+        alpha = params(1); b = params(2); beta_p = params(3); beta_n = params(4);
+        c_p = params(5); c_n = params(6); gamma_c = params(7);
+        
+        for j = 1:numel(TCumulants)
+            TCumulants(j) = c_p * beta_p ^ (alpha - j) .* gamma(j - alpha) ...
+                + (-1)^j * c_n * beta_n ^ (alpha - j) .* gamma(j - alpha);
+        
+            if strcmp(model, 'OU-CTS')
+                    TCumulants(j) = (1 - exp(-j * b * T)) / (j * b) * TCumulants(j) * 1000;
+                elseif strcmp(model, 'CTS-OU')
+                    TCumulants(j) = (1 - exp(-j * b * T)) * TCumulants(j) * 1000;
+            end
+        end
+    case 'Gamma-OU'
+        % vedere .12 di Sabino e Cufaro Petroni
 end
 end
