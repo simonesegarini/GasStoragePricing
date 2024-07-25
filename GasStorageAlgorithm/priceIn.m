@@ -1,4 +1,4 @@
-function cashflows = priceIn(S, cashflows, h, N, M, delta, alpha, T, maxInjection, maxWithdraw, numKnots, method)
+function cashflows = priceIn(S, cashflows, h, N, M, rates, alpha, T, maxInjection, maxWithdraw, numKnots, method)
 % IN pricing of the storage contract with BW induction.
 %
 % INPUT:
@@ -90,7 +90,7 @@ for j = T:-1:1 % bw iterations in time
             
             % Update cashflow with the backward method by using the actions 
             % with the highest expected future cash flow.
-            temp_cf(z,i) = exp(-delta) * cashflows(z, i-actions(idx)) + h(S(z,j+1), actions(idx).*alpha);
+            temp_cf(z,i) = exp(-rates(z, j+1)) * cashflows(z, i-actions(idx)) + h(S(z,j+1), actions(idx).*alpha);
         end
     end
 

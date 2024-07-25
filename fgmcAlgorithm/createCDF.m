@@ -53,4 +53,21 @@ RawCDF = RawCDF(valid_idxs);
 [CDF_hat, idxs_unique] = unique(CDF_hat);
 xgrid_hat = xgrid_hat(idxs_unique);
 
+% Plot of the CDF obtained by inverting the CF and of the final plot with
+% all the infos needed for debugging, uncomment if probelms arise.
+%
+alpha = params(1);
+
+figure;
+plot(xgrid, RawCDF, '-k');
+title(['Raw CDF with alpha = ', num2str(alpha)])
+
+figure;
+plot(xgrid_hat, CDF_hat, '--r')
+title(['Plot with alpha = ', num2str(alpha)])
+hold on;
+first_last = [xgrid_hat(1), CDF_hat(1); xgrid_hat(end), CDF_hat(end)];
+plot(first_last(:, 1), first_last(:, 2), '*g')
+legend('Interpolated Inverted CDF', 'Interpolated values', 'Limits', 'Exponential extrapolation Over', 'Exponential extrapolation Under')
+
 end

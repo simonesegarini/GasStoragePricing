@@ -1,3 +1,7 @@
+% Script used to iterate a pricing algorithm over a certain number of
+% simulations. Note that it needs to me modified for each process and it
+% does not include the simulation of rates.
+
 clear all, close all, clc
 
 %% STANDARD STORAGE CONTRACT DATA
@@ -6,9 +10,6 @@ a1 = 0; b1 = 0;
 
 % Cost of selling parameters.
 a2 = 0; b2 = 0;
-
-% Discount rate.
-delta = 0;
 
 % Payoff for each action.
 payoff = @(s, deltaV) -((1+a1).*s + b1).*deltaV.*(deltaV > 0) ...
@@ -38,7 +39,8 @@ seed = 2;
 paramsTS = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0]; % Params for the OU-TS case
 
 % Number of simulations.
-numberSimulations = [50, 500, 5000]; 
+%numberSimulations = [50, 500, 5000]; 
+numberSimulations = [10000, 15000, 25000];
 
 % Discretization for the backward induction.
 alpha = 2500; % width of the volume interval
@@ -63,9 +65,14 @@ CIs = zeros(numel(order), numel(numberSimulations), 2);
 
 for simIt=1:numel(numberSimulations)
     
-    
-    X = spotSimulation('OU-TS', paramsTS, numberSimulations(simIt), 365, T, 24, seed, 1e-10, 'exde');
+    disp(['Now doing #sim = ', num2str(numberSimulations(simIt))])
+    Xs = spotSimulation('TS-OU', paramsTS, numberSimulations(simIt), 365, T, 18, seed, 1e-10, 'fgmc');
+    X = Xs(1:numberSimulations(simIt), :); %XAV = Xs_OU_TS(numberSimulations(simIt)+1:end, :);
     S = S0*exp(X);
+    %SAV = S0*exp(XAV);
+
+    % Discount rate.
+    delta = zeros(numberSimulations(simIt), T+1);
 
     for regIt=1:numel(order)
         cashflowsSym = penFunc(S(:,end), ones(numberSimulations(simIt),1)*dV');

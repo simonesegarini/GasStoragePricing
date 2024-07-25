@@ -35,8 +35,8 @@ switch model
         lamb_n = c_n*beta_n^alpha*gamma(-alpha);
         lamb = lamb_p+lamb_n;
 
-%         mu = (1-exp(-b.*dt))./b.*(gamma_c + lamb_p.*alpha./beta_p - lamb_n.*alpha./beta_n);
-%         mu = (1-exp(-b.*dt)).*(gamma_c./b + alpha./beta_p - alpha./beta_n);
+        mu = (1-exp(-b.*dt))./b.*(gamma_c + lamb_p.*alpha./beta_p - lamb_n.*alpha./beta_n);
+        % mu = (1-exp(-b.*dt)).*(gamma_c./b + alpha./beta_p - alpha./beta_n);
     case 'TS-OU'
         b = params(2); c_p = params(5); c_n = params(6);
 
@@ -54,7 +54,7 @@ idxs = find(Bt == 1);
 % processes just where we have a jump.
 increments = zeros(size(U));
 % if strcmp(model, 'OU-TS')
-%     increments(idxs) = fgmcIA(xgrid_hat, CDF_hat, U(idxs)) + mu;
+%     increments(idxs) = fgmcIA(xgrid_hat, CDF_hat, U(idxs)) + U(idxs).*mu;
 % else
 %     increments(idxs) = fgmcIA(xgrid_hat, CDF_hat, U(idxs));
 % end
