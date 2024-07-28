@@ -11,7 +11,7 @@ function TSrv = simulationTS_DR(alpha, lambda, theta, nSim)
 % OUTPUT:
 % TSrv:                 TS simulated variables
 
-%lambda = lambda.*theta.^(1/alpha);
+% lambda = lambda.*theta^(1/alpha);
 
 % Set up the parameters from Devroye 2009.
 gamma = lambda^alpha * alpha * (1-alpha);
@@ -101,15 +101,15 @@ while sum(accepted_outer) < nSim
     
     end
 
-%     figure
-%     histogram(W.*rho, 'Normalization','pdf')
+    % figure
+    % histogram(W.*rho, 'Normalization','pdf')
     % Define Z, useful for later.
     Z = W.*rho;
 
     % Find idxs where we didn't accept previously.
     to_generate_outer = find(accepted_outer == 0);
-%     temp_out = sum(accepted_outer);
-%     disp(['Generated outer = ', num2str(temp_out)])
+    temp_out = sum(accepted_outer);
+    disp(['DR: generated outer = ', num2str(temp_out)])
 
     % Generate X with density proportional to g(x,U).
     % Set up constants.
@@ -130,7 +130,8 @@ while sum(accepted_outer) < nSim
     V_first_i3 = V_first >= (a1+a2)./s;
     
     N_first = randn(size(V_first_i1));
-    E_first = exprnd(1, size(V_first_i3));
+    E_first = -log(rand(size(V_first_i3)));
+    % E_first = exprnd(1, size(V_first_i3));
 
     X_temp(V_first_i1) = m(V_first_i1) - delta(V_first_i1).*abs(N_first(V_first_i1));
     U_third = rand(size(V_first_i2));
@@ -151,5 +152,5 @@ while sum(accepted_outer) < nSim
 
 end
 
-TSrv = 1./(X.^b) .* theta;%.^(1/alpha);
+TSrv = 1./(X.^b);% * theta.^alpha;
 end

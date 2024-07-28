@@ -1,4 +1,4 @@
-function [xgrid, CDF_hat] = approxCDF(CDF_raw, xgrid_raw, toll)
+function [xgrid, CDF_hat] = approxCDF(CDF_raw, xgrid_raw)
 % Given the points of a function, respectively (xgrid_raw, cdf_raw), find 
 % the largest set of consecutive points where cdf_raw is monotone increasing
 % and within
@@ -10,7 +10,6 @@ function [xgrid, CDF_hat] = approxCDF(CDF_raw, xgrid_raw, toll)
 % INPUT:
 % cdf_raw:              raw approximation of the cdf from the FFT
 % xgrid_raw:            raw xgrid of the cdf
-% toll:                 tollerance for CDF selection
 %
 % OUTPUT:
 % xgrid:                xgrid of the cdf
@@ -24,7 +23,7 @@ end_index = 1;
 % Iterate through cdf_raw to find the largest set.
 current_length = 1;
 for i = 2:length(CDF_raw)
-    if CDF_raw(i) >= CDF_raw(i-1)-toll && CDF_raw(i) <= 1 && CDF_raw(i) >= 0
+    if CDF_raw(i) >= CDF_raw(i-1) && CDF_raw(i) <= 1 && CDF_raw(i) >= 0
         current_length = current_length + 1;
         if current_length > max_length
             max_length = current_length;

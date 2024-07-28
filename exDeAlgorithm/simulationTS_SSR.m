@@ -17,21 +17,24 @@ accepted = zeros(nSim, 1);
 
 while sum(accepted) < nSim
 
+    temp = sum(accepted);
+    disp(['SSR: generated = ', num2str(temp)])
+
     % Find idxs where we didn't accept previously.
     to_generate = find(accepted == 0);
 
     % Generate a stable rv via Zolotarev's integral representation.
-    Us = (rand(size(to_generate))-0.5)*pi;
-    Es = exprnd(1, size(Us));
-    S = (-theta.*gamma(-alpha)).^(1/alpha) .* sin(alpha.*Us + 0.5*pi*alpha) ...
-        ./ cos(Us).^(1/alpha) .* (cos((1-alpha).*Us - 0.5*pi*alpha)./Es)...
+    U = (rand(size(to_generate))-0.5)*pi;
+    E = -log(rand(size(U)));
+    S = (-theta.*gamma(-alpha)).^(1/alpha) .* sin(alpha.*U + 0.5*pi*alpha) ...
+        ./ cos(U).^(1/alpha) .* (cos((1-alpha).*U - 0.5*pi*alpha)./E)...
         .^((1-alpha)/alpha);
     
     % Generate a uniformly distributed rv.
-    U = rand(size(Us));
+    V = rand(size(U));
 
     % Check aceptance/rejection.
-    to_accept = (U <= exp(-beta * S));
+    to_accept = (V <= exp(-beta * S));
     accepted(to_generate(to_accept)) = 1;
     TSrv(to_generate(to_accept)) = S(to_accept);
 end

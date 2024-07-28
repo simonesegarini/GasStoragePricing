@@ -1,4 +1,4 @@
-function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, toll)
+function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, scaling_fact)
 % Function that creates the approximated CDF of the increments.
 %
 % INPUT:
@@ -7,7 +7,7 @@ function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, tol
 % dt:                   time horizon
 % model:                char for model selection
 % activity:             char for model selection
-% toll:                 tollerance for CDF selection
+% scaling_fact:         parameter to stretch the CDF and handle low alphas
 %
 % OUTPUT:
 % xgrid_hat:            grid for the x values
@@ -31,13 +31,13 @@ numericalParams.x1 = x_1;
 numericalParams.xN = x_N;
 numericalParams.dx = dx;
 
-% Filter the xgrid to avoid errors when selecting the largest subset
+% Filter the xgrid to avoid errors when selecting the largest subset.
 xgrid = x_1:dx:x_N;
 xgrid = xgrid(xgrid >= -20 & xgrid <= 20);
 
 % FFT to retrieve the CDF on the xgrid.
 % First assign the function for the FFT.
-f = @(u) exp(LogCharFunc(u + 1i .* a, dt, params, model, activity)) ./ (1i .* (u + 1i .* a));
+f = @(u) exp(LogCharFunc(scaling_fact .* (u + 1i .* a), dt, params, model, activity)).^(1/scaling_fact) ./ (1i .* (u + 1i .* a));
 
 I_fft = computeFFT(f, xgrid, numericalParams);
 RawCDF = Ra - exp(a .* xgrid) ./ (2 * pi) .* I_fft;
@@ -49,7 +49,7 @@ RawCDF = RawCDF(valid_idxs);
 
 % Restrict the xgrid by taking the largest set where the raw CDF is
 % monotone increasing.
-[xgrid_hat, CDF_hat] = approxCDF(RawCDF, xgrid, toll);
+[xgrid_hat, CDF_hat] = approxCDF(RawCDF, xgrid, 0);
 [CDF_hat, idxs_unique] = unique(CDF_hat);
 xgrid_hat = xgrid_hat(idxs_unique);
 
@@ -68,6 +68,6 @@ title(['Plot with alpha = ', num2str(alpha)])
 hold on;
 first_last = [xgrid_hat(1), CDF_hat(1); xgrid_hat(end), CDF_hat(end)];
 plot(first_last(:, 1), first_last(:, 2), '*g')
-legend('Interpolated Inverted CDF', 'Interpolated values', 'Limits', 'Exponential extrapolation Over', 'Exponential extrapolation Under')
+legend('Interpolated Inverted CDF', 'Limits')
 
 end

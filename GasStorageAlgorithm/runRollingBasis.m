@@ -4,7 +4,6 @@
 
 clear all, close all, clc
 
-%% STANDARD STORAGE CONTRACT DATA
 % Cost of injection parameters.
 a1 = 0; b1 = 0;
 
@@ -29,7 +28,7 @@ Imax = @(v) min(Vmax - v, 2500);
 % storage volume.
 penFunc = @(s, v) -s.*abs(v-VT).^2;
 
-%% 1. SPOT PRICE SIMULATION 
+% Contract details.
 T = 365;
 S0 = 14.88;
 seed = 2;

@@ -14,12 +14,12 @@ function TSrv = simulationTS_DR3(alpha, lambda, theta, nSim)
 % Consider Remark 3.
 
 % Set up the parameters from Devroye 2009.
-b = (1-alpha).*alpha; lambda_alpha = lambda.^alpha; 
-gamm = lambda_alpha.*alpha.*(1-alpha); s_gamma = sqrt(gamm); 
+b = (1-alpha)/alpha; lambda_alpha = lambda.^alpha; 
+gamm = lambda_alpha*alpha*(1-alpha); s_gamma = sqrt(gamm); 
 s_pi = sqrt(pi); c1 = sqrt(pi/2); c2 = 2+c1; c3 = s_gamma.*c2;
 xsi = (1+sqrt(2).*c3)./pi; psi = c3.*exp(-gamm.*pi.^2./8)./s_pi;
 
-w1 = c1.*xsi./s_gamma; w2 = 2.*xsi.*s_pi; w3 = xsi.*pi;
+w1 = c1.*xsi./s_gamma; w2 = 2.*psi.*s_pi; w3 = xsi.*pi;
 
 % Define the function A and B, set also the value of B(0).
 S = @(x) sin(x)./x;
@@ -69,33 +69,33 @@ for i=1:nSim
             rho = pi.*exp(-lambda_alpha.*(1-1./zeta.^2))./(z+(1+c1).*s_gamma./zeta);
             d = 0;
 
-            if ((U>=0).*(gamm >=1))
+            if ((U>=0) && (gamm >=1))
                 d = d+xsi.*exp(-gamm.*U.^2./2);
             end
-            if ((U>0).*(U<pi))
+            if ((U>0) && (U<pi))
                 d = d + psi./sqrt(pi-U);
             end
-            if ((U>=0).*(U<=pi).*(gamm <1))
+            if ((U>=0) && (U<=pi) && (gamm <1))
                 d = d + xsi;
             end
 
             rho = rho.*d;
 
             W = rand(1);
-            Z = rho.*W;
+            Z = rho*W;
 
             % Check acceptance/rejection.
-            if ((U < pi).*(Z <= 1))
+            if ((U < pi) && (Z <= 1))
                 accepted_inner = true;
             end
         end
     
         % Generate X with density proportional to g(x,U).
         % Set up constants.
-        a = A(U); m = (b./a).^alpha .* lambda_alpha;
-        delta = sqrt(m.*alpha./a);
-        a1 = delta.*c1;
-        a3 = z./a;
+        a = A(U); m = (b/a)^alpha * lambda_alpha;
+        delta = sqrt(m*alpha/a);
+        a1 = delta*c1;
+        a3 = z/a;
         s = a1 + delta + a3;
     
         % Generate V_first uniformly in [0,1].
@@ -105,30 +105,32 @@ for i=1:nSim
     
         % Filter V_first to simulate differently X
 
-        if V_first < a1./s
+        if V_first < a1/s
             N_first = randn(1);
             X(i) = m-delta.*abs(N_first);
-        elseif V_first < (a1+delta)./s
-            U_first = rand(1);
-            X(i) = m + delta.*U_first;
         else
-            E_first = exprnd(1);
-            X(i) = m + delta + E_first.*a3;
+            if V_first < (a1+delta)/s
+                U_first = rand(1);
+                X(i) = m + delta.*U_first;
+            else
+                E_first = -log(rand(1));
+                X(i) = m + delta + E_first.*a3;
+            end
         end
 
         % Generate E as an exponential rv.
         E = -log(Z);
     
         % Check acceptance/rejection.
-        c = a.*(X(i) - m) + exp((1./alpha).*log(lambda_alpha) -b.*log(m)) ...
-            .* ((m./X(i)).^b-1);
+        c = a*(X(i) - m) + exp((1/alpha)*log(lambda_alpha) -b*log(m)) ...
+            * ((m/X(i))^b-1);
         if X(i) < m
-            c = c -N_first.^2./2;
+            c = c - N_first^2/2;
         elseif X(i) > m + delta
             c = c - E_first;
         end
 
-        if ((X(i) >= 0) .* (c<=E))
+        if ((X(i) >= 0) && (c<=E))
             accepted_outer = true;
         end
     end

@@ -32,24 +32,33 @@ switch model
         % Compute X1 by doing a TS simulations.
         X1p_DR = simulationTS_DR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
         X1n_DR = simulationTS_DR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
+
         X1p = simulationTS_SSR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
         X1n = simulationTS_SSR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
 
         figure
         subplot(1,2,1)
         plot(X1p_DR, '.r')
-        title('DR method, prositive TS')
+        title('DR method, positive TS')
         subplot(1,2,2)
         plot(X1p, '.b')
-        title('SSR method, prositive TS')
+        title('SSR method, positive TS')
 
         figure
         subplot(1,2,1)
         histogram(X1p_DR, 'Normalization', 'pdf')
-        title('DR method, prositive TS')
+        title('DR method, positive TS')
         subplot(1,2,2)
         histogram(X1p, 'Normalization', 'pdf')
         title('SSR method, prositive TS')
+
+        figure
+        subplot(1,2,1)
+        histogram(X1n_DR, 'Normalization', 'pdf')
+        title('DR method, negative TS')
+        subplot(1,2,2)
+        histogram(X1n, 'Normalization', 'pdf')
+        title('SSR method, negative TS')
 
         % Cumulants to compensate.
         ctsCumulants = computeCumulants(0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], dt, 'OU-CTS')/1000;
@@ -130,4 +139,6 @@ end
 
 % Compute the total increment as return value.
 increments = gamma_c*dt + X1p_DR + X2p - X1n_DR - X2n - ctsCumulants(1);
+% increments = gamma_c*dt + X1p + X2p - X1n - X2n - ctsCumulants(1);
+
 end

@@ -7,9 +7,6 @@ a1 = 0; b1 = 0;
 % Cost of selling parameters.
 a2 = 0; b2 = 0;
 
-% Discount rate.
-delta = 0.02;
-
 % Payoff for each action.
 payoff = @(s, deltaV) -((1+a1).*s + b1).*deltaV.*(deltaV > 0) ...
                 - ((1-a2).*s - b2).*deltaV.*(deltaV < 0);
