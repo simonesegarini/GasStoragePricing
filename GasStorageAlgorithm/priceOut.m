@@ -1,4 +1,4 @@
-function cashflows = priceOut(S, cashflows, betas, h, N, M, delta, alpha, T, maxInjection, maxWithdraw, numKnots, method)
+function cashflows = priceOut(S, cashflows, betas, h, N, M, rates, alpha, T, maxInjection, maxWithdraw, numKnots, method)
 % Compute the price with the OUT method by using the regression
 % coefficients computed in the IN methodology.
 %
@@ -82,7 +82,7 @@ for j = T:-1:1 % bw iterations in time
             policy(i, z) = actions(idx);
             
             % Update cashflow with the backward method.
-            temp_cf(z,i) = exp(-delta).*cashflows(z,i-policy(i,z)) + h(S(z,j+1), policy(i,z)'.*alpha);
+            temp_cf(z,i) = exp(-rates(z, j+1)).*cashflows(z,i-policy(i,z)) + h(S(z,j+1), policy(i,z)'.*alpha);
         end
         
     end

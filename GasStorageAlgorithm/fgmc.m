@@ -1,4 +1,4 @@
-function X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact)
+function Xs = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact)
 % Finite General Monte Carlo algorithm for OU-Lévy and Lévy-OU processes.
 %
 % INPUT:
@@ -28,6 +28,7 @@ alpha = params(1); b = params(2);
 
 U = rand(N, M);
 X = zeros(N,M+1);
+XAV = zeros(N, M+1);
 
 % Check if the model has finite/infinite activity and finite/infinite
 % variation.
@@ -60,12 +61,20 @@ end
 % Compute Zt based on the type of process.
 if strcmp(activity, 'Infinite')
     for j = 1:M
+        % V1 di AV
+%         Zt = fgmcIA(xgrid_hat, CDF_hat, U(:,j));
+%         X(:, j+1) = exp(-b.*dt).*X(:, j) + Zt;
+%         XAV(:, j+1) = exp(-b.*dt).*XAV(:, j) - Zt;
+
+        % V2 di AV
         X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j));
+        XAV(:, j+1) = exp(-b.*dt).*XAV(:, j) + fgmcIA(xgrid_hat, CDF_hat, 1-U(:,j));
     end
 elseif strcmp(activity, 'Finite')
     for j = 1:M
         X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcFA(xgrid_hat, CDF_hat, U(:,j), dt, params, model);
     end
 end
-
+% checkAntitheticCovariance(X, XAV);
+Xs = [X; XAV];
 end

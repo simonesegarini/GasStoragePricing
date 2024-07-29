@@ -1,4 +1,4 @@
-function X = spotSimulation(model, params, N, M, T, Mfft, seed, toll, alg)
+function X = spotSimulation(model, params, N, M, T, Mfft, seed, scaling_fact, alg)
 % Spot simulation based on model selected: OU returns 2*M simulations by
 % using AV algorithm, OU-NTS and OU-TS return M simulations using fgmc
 % algorithm
@@ -11,7 +11,7 @@ function X = spotSimulation(model, params, N, M, T, Mfft, seed, toll, alg)
 % T:                    time horizon
 % Mfft:                 parameter for FFT
 % seed:                 set the seed of the simulation
-% toll:                 tollerance for the CDF
+% scaling_fact:         parameter to stretch the CDF and handle low alphas
 % alg:                  algorithm selection (optional)
 %
 % OUTPUT:
@@ -22,18 +22,18 @@ switch model
         X = spotSimulationOU(params, N, M, T, seed);
 
     case {'OU-NTS', 'NTS-OU'}
-        X = fgmc(model, params, N, M, T, Mfft, seed, toll);
+        X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact);
 
     case {'OU-TS', 'TS-OU'}
         if nargin == 9
             switch alg
                 case 'fgmc'
-                    X = fgmc(model, params, N, M, T, Mfft, seed, toll);
+                    X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact);
                 case 'exde'
                     X = exDe(model, params, N, M, T, seed);
             end
         else
-            X = fgmc(model, params, N, M, T, Mfft, seed, toll);
+            X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact);
         end
 end
 end

@@ -36,20 +36,20 @@ seed = 2;
 r0 = 0.02;
 
 % Parameters for Vasicek
-kappaV = 0.3/T; % Speed of mean reversion
+kappaV = 0.3; % Speed of mean reversion
 thetaV = 0.05; % Long-term mean rate
-sigmaV = 0.02/sqrt(T); % Volatility
+sigmaV = 0.02; % Volatility
 paramsRatesVasicek = [kappaV, thetaV, sigmaV];
 
 % Parameters for CIR
-kappaC = 0.2/T; % Speed of mean reversion
+kappaC = 0.2; % Speed of mean reversion
 thetaC = 0.04; % Long-term mean rate
-sigmaC = 0.1/sqrt(T); % Volatility
+sigmaC = 0.01; % Volatility
 paramsRatesCIR = [kappaC, thetaC, sigmaC];
 
-%rates = simulateInterestRatePaths('Vasicek', r0, paramsRatesVasicek, numberSimulations, 365, T, seed);
+% rates = simulateInterestRatePaths('Vasicek', r0, paramsRatesVasicek, numberSimulations, 365, T, seed);
 rates = simulateInterestRatePaths('CIR', r0, paramsRatesCIR, numberSimulations, 365, T, seed);
-%rates = zeros(numberSimulations, T+1);
+% rates = zeros(numberSimulations, T+1);
 
 %% 1. SPOT PRICE SIMULATION 
 S0 = 14.88;
@@ -77,20 +77,20 @@ maxInjection = Imax(dV*ones(1,T));
 
 %% Simulations with all type of processes studied in fgmc algorithm
 % Simulation of the underlying for the OU case, low volatility.
-XsL = spotSimulation('OU', paramsOUL, numberSimulations, 365, T, 0, seed, 0);
+XsL = spotSimulation('OU', paramsOUL, numberSimulations, 365, T, 0, seed, 1);
 X_OUL = XsL(1:numberSimulations, :); XAV_OUL = XsL(numberSimulations+1:end, :);
 S_OUL = S0*exp(X_OUL);
 SAV_OUL = S0*exp(XAV_OUL);
 
 % Simulation of the underlying for the OU case, high volatility.
-XsH = spotSimulation('OU', paramsOUH, numberSimulations, 365, T, 0, seed, 0);
+XsH = spotSimulation('OU', paramsOUH, numberSimulations, 365, T, 0, seed, 1);
 X_OUH = XsH(1:numberSimulations, :); XAV_OUH = XsH(numberSimulations+1:end, :);
 S_OUH = S0*exp(X_OUH);
 SAV_OUH = S0*exp(XAV_OUH);
 
 % Simulation of the underlying for the OU-NTS symmetric case.
 tic
-Xs_OU_NTSsymm = spotSimulation('OU-NTS', paramsNTSsymm, numberSimulations, 365, T, 16, seed, 1e-8);
+Xs_OU_NTSsymm = spotSimulation('OU-NTS', paramsNTSsymm, numberSimulations, 365, T, 16, seed, 1);
 X_OU_NTSsymm = Xs_OU_NTSsymm(1:numberSimulations, :); XAV_OU_NTSsymm = Xs_OU_NTSsymm(numberSimulations+1:end, :);
 timeOU_NTSsymm = toc;
 S_OU_NTSsymm = S0*exp(X_OU_NTSsymm);
@@ -98,7 +98,7 @@ SAV_OU_NTSsymm = S0*exp(XAV_OU_NTSsymm);
 
 % Simulation of the underlying for the OU-NTS asymmetric case.
 tic
-Xs_OU_NTSasymm = spotSimulation('OU-NTS', paramsNTSasymm, numberSimulations, 365, T, 16, seed, 1e-8);
+Xs_OU_NTSasymm = spotSimulation('OU-NTS', paramsNTSasymm, numberSimulations, 365, T, 16, seed, 1);
 X_OU_NTSasymm = Xs_OU_NTSasymm(1:numberSimulations, :); XAV_OU_NTSasymm = Xs_OU_NTSsymm(numberSimulations+1:end, :);
 timeOU_NTSasymm = toc;
 S_OU_NTSasymm = S0*exp(X_OU_NTSasymm);
@@ -106,7 +106,7 @@ SAV_OU_NTSasymm = S0*exp(XAV_OU_NTSasymm);
 
 % Simulation of the underlying for the NTS-OU symmetric case.
 tic
-Xs_NTS_OUsymm = spotSimulation('NTS-OU', paramsNTSsymm, numberSimulations, 365, T, 24, seed, 1e-10);
+Xs_NTS_OUsymm = spotSimulation('NTS-OU', paramsNTSsymm, numberSimulations, 365, T, 16, seed, 1);
 X_NTS_OUsymm = Xs_NTS_OUsymm(1:numberSimulations, :); XAV_NTS_OUsymm = Xs_NTS_OUsymm(numberSimulations+1:end, :);
 timeNTS_OUsymm = toc;
 S_NTS_OUsymm = S0*exp(X_NTS_OUsymm);
@@ -114,7 +114,7 @@ SAV_NTS_OUsymm = S0*exp(XAV_NTS_OUsymm);
 
 % Simulation of the underlying for the NTS-OU asymmetric case.
 tic
-Xs_NTS_OUasymm = spotSimulation('NTS-OU', paramsNTSasymm, numberSimulations, 365, T, 24, seed, 1e-10);
+Xs_NTS_OUasymm = spotSimulation('NTS-OU', paramsNTSasymm, numberSimulations, 365, T, 16, seed, 1);
 X_NTS_OUasymm = Xs_NTS_OUasymm(1:numberSimulations, :); XAV_NTS_OUasymm = Xs_NTS_OUasymm(numberSimulations+1:end, :);
 timeNTS_OUasymm = toc;
 S_NTS_OUasymm = S0*exp(X_NTS_OUasymm);
@@ -122,7 +122,7 @@ SAV_NTS_OUasymm = S0*exp(XAV_NTS_OUasymm);
 
 % Simulation of the underlying for the OU-TS case.
 tic
-Xs_OU_TS = spotSimulation('OU-TS', paramsTS, numberSimulations, 365, T, 18, seed, 1e-10, 'fgmc');
+Xs_OU_TS = spotSimulation('OU-TS', paramsTS, numberSimulations, 365, T, 16, seed, 1);
 X_OU_TS = Xs_OU_TS(1:numberSimulations, :); XAV_OU_TS = Xs_OU_TS(numberSimulations+1:end, :);
 timeOU_TS = toc;
 S_OU_TS = S0*exp(X_OU_TS);
@@ -130,7 +130,7 @@ SAV_OU_TS = S0*exp(XAV_OU_TS);
 
 % Simulation of the underlying for the TS-OU case.
 tic
-Xs_TS_OU = spotSimulation('TS-OU', paramsTS, numberSimulations, 365, T, 25, seed, 1e-12, 'fgmc');
+Xs_TS_OU = spotSimulation('TS-OU', paramsTS, numberSimulations, 365, T, 16, seed, 1);
 X_TS_OU = Xs_TS_OU(1:numberSimulations, :); XAV_TS_OU = Xs_TS_OU(numberSimulations+1:end, :);
 timeTS_OU = toc;
 S_TS_OU = S0*exp(X_TS_OU);

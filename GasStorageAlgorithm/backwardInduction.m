@@ -1,4 +1,4 @@
-function [cashflows, policies, regressors] = backwardInduction(S, cashflows, h, N, M, delta, alpha, T, maxInjection, maxWithdraw, numKnots, method)
+function [cashflows, policies, regressors] = backwardInduction(S, cashflows, h, N, M, rates, alpha, T, maxInjection, maxWithdraw, numKnots, method)
 % Simulation the evolution of the storage and the payoff with BW induction
 %
 % INPUT:
@@ -84,7 +84,7 @@ for j = T:-1:1 % bw iterations in time
             policy(i, z) = actions(idx);
             
             % update cashflow bw
-            temp_cf(z,i) = exp(-delta).*cashflows(z,i-policy(i,z)) + h(S(z,j+1), policy(i,z)'.*alpha);
+            temp_cf(z,i) = exp(-rates(z, j+1)).*cashflows(z,i-policy(i,z)) + h(S(z,j+1), policy(i,z)'.*alpha);
         end
         
     end

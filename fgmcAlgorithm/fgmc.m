@@ -60,7 +60,7 @@ end
 % Compute Zt based on the type of process.
 if strcmp(activity, 'Infinite')
     for j = 1:M
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j));
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j))./scaling_fact;
     end
 elseif strcmp(activity, 'Finite')
     for j = 1:M

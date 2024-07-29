@@ -31,5 +31,6 @@ for j=1:M
 end
 
 Xs = [X; XAV];
+% checkAntitheticCovariance(X, XAV);
 
 end

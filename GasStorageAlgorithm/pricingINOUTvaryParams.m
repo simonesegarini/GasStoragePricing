@@ -1,4 +1,5 @@
 clear all, close all, clc
+warning('off', 'all')
 
 %% STANDARD STORAGE CONTRACT DATA
 % Cost of injection parameters.
@@ -7,8 +8,6 @@ a1 = 0; b1 = 0;
 % Cost of selling parameters.
 a2 = 0; b2 = 0;
 
-% Discount rate.
-delta = 0;
 
 % Payoff for each action.
 payoff = @(s, deltaV) -((1+a1).*s + b1).*deltaV.*(deltaV > 0) ...
@@ -32,11 +31,12 @@ penFunc = @(s, v) -s.*abs(v-VT).^2;
 T = 365;
 S0 = 14.88;
 
-% Setted for OU-NTS, both sym and asym.
-alphas = [0.8, 0.6, 0.4, 0.2, -1.0, -2.0]; thetas = [0, 0.1];
+% Parameters.
+% OU-TS.
+paramsTS = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0];
 
 % Number of simulations.
-numberSimulations = [250, 2500, 25000];
+numberSimulations = [10000, 15000, 25000];
 
 % Discretization for the backward induction.
 alpha = 2500; % width of the volume interval
@@ -49,43 +49,54 @@ maxWithdraw = Imin(dV*ones(1,T));
 maxInjection = Imax(dV*ones(1,T));
 
 % Choose the model.
-model = 'OU-NTS';
+model = 'OU-TS';
 
 % Allocate the values to be saved.
 price_IN = zeros(3,1); IN_STD = zeros(3,1); price_IN_CI = zeros(3,2);
 price_OUT = zeros(3,1); OUT_STD = zeros(3,1); price_OUT_CI = zeros(3,2);
 
-for i=1:numel(thetas)
-    for j=1:numel(alphas)
-        for z=1:numel(numberSimulations)
 
-            numSims = numberSimulations(z);
+for z=1:numel(numberSimulations)
 
-            % Params for the OU-NTS case.
-            params = [alphas(j), 0.2162, 0.201, 0.256, thetas(i)]; 
+    numSims = numberSimulations(z);
 
-            % Simulation of the underlying for the OU-NTS case
-            X = spotSimulation(model, params, numSims, 365, T, 16, 1, 1e-8);
-            S = S0*exp(X);
+    % Discount rate.
+    delta = zeros(numSims, T+1);
+
+    % Simulation of the underlying for the OU-NTS case
+    disp(['Now doing underling simulations for #sim = ', num2str(numSims)])
+    Xs = spotSimulation(model, paramsTS, numSims, 365, T, 16, 1, 1);
+    X = Xs(1:numSims, :); %XAV = Xs_OU_TS(numberSimulations(simIt)+1:end, :);
+    S = S0*exp(X);
+    %SAV = S0*exp(XAV);
+    clear Xs;
+
+    % 2. ASSIGN A VALUE TO THE CONTRACT AT MATURITY
+    % Matrices with the cashflows
+    cashflows_IN = penFunc(S(:,end), ones(numSims,1)*dV');
     
-            % 2. ASSIGN A VALUE TO THE CONTRACT AT MATURITY
-            % Matrices with the cashflows
-            cashflows_IN = penFunc(S(:,end), ones(numSims,1)*dV');
-            
-            % 3. APPLY BACKWARD INDUCTION
-            [cashflows_IN, ~, regressors_IN] = backwardInduction(S, cashflows_IN, payoff, N, numSims, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
+    disp(['Now applying backward induction for #sim = ', num2str(numSims)])
+    % 3. APPLY BACKWARD INDUCTION
+    [cashflows_IN, ~, regressors_IN] = backwardInduction(S, cashflows_IN, payoff, N, numSims, delta, alpha, T, maxInjection, maxWithdraw, 5, 'polynomial');
+    
+    disp(['Now princing (in) for #sim = ', num2str(numSims)])
+    % 4. PRICE IN
+    [price_IN(z,:), ~ , price_IN_CI(z,:)] = normfit(cashflows_IN(:, index_V0));
+    IN_STD(z,:) = standardError(cashflows_IN(:, index_V0));
+    clear cashflows_IN;
 
-            X_OUT = spotSimulation(model, params, numSims, 365, T, 16, 2, 1e-8);
-            S_OUT = S0*exp(X_OUT);
-            cashflows_OUT = penFunc(S_OUT(:,end), ones(numSims,1)*dV');
-            cashflows_OUT = priceOut(S_OUT, cashflows_OUT, regressors_IN, payoff, N, numSims, delta, alpha, T, maxInjection, maxWithdraw, 4, 'polynomial');
-            
-            % 4. PRICE
-            % Compute the final price as the mean of accumulated cash flows at t=0 across all simulations
-            [price_IN(z,:), IN_STD(z,:), price_IN_CI(z,:)] = normfit(cashflows_IN(:, index_V0));
-            [price_OUT(z,:), OUT_STD(z,:), price_OUT_CI(z,:)] = normfit(cashflows_OUT(:, index_V0));
-        end
-        name = sprintf('INOUT_Model_%s__alpha_%0.1f__theta_%0.1f.mat', model, alphas(j), thetas(i));
-        save(name, 'price_IN', 'IN_STD', 'price_IN_CI', 'price_OUT', 'OUT_STD', 'price_OUT_CI')
-    end
+    % 5. PRICE OUT
+    disp(['Now doing out procedure for simulations for #sim = ', num2str(numSims)])
+    Xs_OUT = spotSimulation(model, paramsTS, numSims, 365, T, 16, 2, 1);
+    X_OUT = Xs_OUT(1:numSims, :);
+    S_OUT = S0*exp(X_OUT);
+    clear Xs_OUT;
+
+    cashflows_OUT = penFunc(S_OUT(:,end), ones(numSims,1)*dV');
+    cashflows_OUT = priceOut(S_OUT, cashflows_OUT, regressors_IN, payoff, N, numSims, delta, alpha, T, maxInjection, maxWithdraw, 5, 'polynomial');
+    
+    [price_OUT(z,:), ~ , price_OUT_CI(z,:)] = normfit(cashflows_OUT(:, index_V0));
+    OUT_STD(z,:) = standardError(cashflows_OUT(:, index_V0));
+    clear cashflows_OUT;
+
 end

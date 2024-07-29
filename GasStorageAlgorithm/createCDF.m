@@ -49,7 +49,7 @@ RawCDF = RawCDF(valid_idxs);
 
 % Restrict the xgrid by taking the largest set where the raw CDF is
 % monotone increasing.
-[xgrid_hat, CDF_hat] = approxCDF(RawCDF, xgrid, 0);
+[xgrid_hat, CDF_hat] = approxCDF(RawCDF, xgrid);
 [CDF_hat, idxs_unique] = unique(CDF_hat);
 xgrid_hat = xgrid_hat(idxs_unique);
 end
