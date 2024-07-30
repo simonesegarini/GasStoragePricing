@@ -33,6 +33,9 @@ switch model
         X1p_DR = simulationTS_DR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
         X1n_DR = simulationTS_DR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
 
+%         X1p_DR = X1p_DR./(c_p^(1/alpha));
+%         X1n_DR = X1n_DR./(c_n^(1/alpha));
+
         X1p = simulationTS_SSR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
         X1n = simulationTS_SSR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
 

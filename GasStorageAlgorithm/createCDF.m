@@ -37,7 +37,7 @@ xgrid = xgrid(xgrid >= -20 & xgrid <= 20);
 
 % FFT to retrieve the CDF on the xgrid.
 % First assign the function for the FFT.
-f = @(u) exp(LogCharFunc(scaling_fact .* (u + 1i .* a), dt, params, model, activity)).^(1/scaling_fact) ./ (1i .* (u + 1i .* a));
+f = @(u) exp(LogCharFunc(scaling_fact .* (u + 1i .* a), dt, params, model, activity))./ (1i .* (u + 1i .* a));
 
 I_fft = computeFFT(f, xgrid, numericalParams);
 RawCDF = Ra - exp(a .* xgrid) ./ (2 * pi) .* I_fft;

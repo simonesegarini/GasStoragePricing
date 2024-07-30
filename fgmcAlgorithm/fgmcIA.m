@@ -34,6 +34,6 @@ incrUnder = -1/bUnder*log(UUnder);
 increments(U > CDF_hat(end)) = incrOver;
 increments(U < CDF_hat(1)) = incrUnder;
 
-disp(['Extrapolated points: ', num2str(length(U)-sum(idxs_within))])
-disp(' ')
+% disp(['Extrapolated points: ', num2str(length(U)-sum(idxs_within))])
+% disp(' ')
 end

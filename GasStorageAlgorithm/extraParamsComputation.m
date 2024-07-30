@@ -71,8 +71,7 @@ switch model
                             l = (c_p + c_n) * pi / 2 * (1 - exp(-b * dt)) / b;
                         else % GENERAL OU-TS CASE.
                             omega = alpha;
-                            scale = 1;
-                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) / (alpha * b) * scale^alpha;
+                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) / (alpha * b);
                         end
                     else % TS-OU
                         if alpha == 1 % Other special case for TS-OU, exp decay.

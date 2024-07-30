@@ -11,7 +11,7 @@ function TSrv = simulationTS_DR(alpha, lambda, theta, nSim)
 % OUTPUT:
 % TSrv:                 TS simulated variables
 
-% lambda = lambda.*theta^(1/alpha);
+lambda = lambda.*theta^(1/alpha);
 
 % Set up the parameters from Devroye 2009.
 gamma = lambda^alpha * alpha * (1-alpha);
@@ -66,8 +66,9 @@ while sum(accepted_outer) < nSim
             V_inf_idxs = V < w1/(w1+w2);
             V_sup_idxs = V >= w1/(w1+w2);
             
-            N = randn(size(V_inf_idxs), 1);
-            U_temp(V_inf_idxs) = abs(N)./sqrt(gamma);
+            % Can improve here
+            N = randn(size(V_inf_idxs));
+            U_temp(V_inf_idxs) = abs(N(V_inf_idxs))./sqrt(gamma);
             U_temp(V_sup_idxs) = pi.*(1-W_first(V_sup_idxs).^2);
         else % gamma < 1
             V_inf_idxs = V < w3/(w3+w2);
@@ -131,7 +132,6 @@ while sum(accepted_outer) < nSim
     
     N_first = randn(size(V_first_i1));
     E_first = -log(rand(size(V_first_i3)));
-    % E_first = exprnd(1, size(V_first_i3));
 
     X_temp(V_first_i1) = m(V_first_i1) - delta(V_first_i1).*abs(N_first(V_first_i1));
     U_third = rand(size(V_first_i2));
@@ -152,5 +152,5 @@ while sum(accepted_outer) < nSim
 
 end
 
-TSrv = 1./(X.^b);% * theta.^alpha;
+TSrv = 1./(X.^b) * theta.^alpha;
 end

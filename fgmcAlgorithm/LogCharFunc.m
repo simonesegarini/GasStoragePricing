@@ -107,8 +107,7 @@ switch model
             lamb_n = c_n*beta_n^alpha*gamma(-alpha);
             lamb = lamb_p+lamb_n;
             phiJ = lamb_p/lamb.*phiJ_p  + lamb_n/lamb.*phiJ_n; 
-            mu = (1-exp(-b.*t))./b.*(gamma_c + lamb_p.*alpha./beta_p - lamb_n.*alpha./beta_n);
-            values = log((exp(lamb*t.*phiJ) - 1)./(exp(lamb*t) - 1)) + 1i.*us.*mu;  
+            values = log((exp(lamb*t.*phiJ) - 1)./(exp(lamb*t) - 1));
         end
 
     case 'TS-OU' 
