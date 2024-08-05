@@ -7,48 +7,62 @@ M = 1; % Number of steps
 N = 1e7; % Number of simulations
 seed = 2; % Seed for the random sampling
 
-%% OU-TS VARYING ALPHA
+%% OU-TS VARYING ALPHA SSR
 alphas = [0.8, 0.4, -1.0, -2.0];
 b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
-TCumulantsOUTSalpha = zeros(numel(alphas), 4);
-ECumulantsOUTSalpha = zeros(numel(alphas), 4);
-timeOUTSalpha = zeros(numel(alphas), 1);
+TCumulantsOUTSalphaSSR = zeros(numel(alphas), 4);
+ECumulantsOUTSalphaSSR = zeros(numel(alphas), 4);
+timeOUTSalphaSSR = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     tic
-    Xt = exDe('OU-TS', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed);
-    timeOUTSalpha(i) = toc;
-    [TCumulantsOUTSalpha(i,:), ECumulantsOUTSalpha(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS');
+    Xt = exDe('OU-TS', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed, 'SSR');
+    timeOUTSalphaSSR(i) = toc;
+    [TCumulantsOUTSalphaSSR(i,:), ECumulantsOUTSalphaSSR(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS');
 end
 
-%% TS-OU VARYING ALPHA
+%% OU-TS VARYING ALPHA DR
+alphas = [0.8, 0.4, -1.0, -2.0];
+b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
+
+TCumulantsOUTSalphaDR = zeros(numel(alphas), 4);
+ECumulantsOUTSalphaDR = zeros(numel(alphas), 4);
+timeOUTSalphaDR = zeros(numel(alphas), 1);
+
+for i=1:numel(alphas)
+    tic
+    Xt = exDe('OU-TS', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed, 'DR');
+    timeOUTSalphaDR(i) = toc;
+    [TCumulantsOUTSalphaDR(i,:), ECumulantsOUTSalphaDR(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS');
+end
+
+%% TS-OU VARYING ALPHA SSR
 alphas = [0.8, 0.4];
 b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
-TCumulantsTSOUalpha = zeros(numel(alphas), 4);
-ECumulantsTSOUalpha = zeros(numel(alphas), 4);
-timeTSOUalpha = zeros(numel(alphas), 1);
+TCumulantsTSOUalphaSSR = zeros(numel(alphas), 4);
+ECumulantsTSOUalphaSSR = zeros(numel(alphas), 4);
+timeTSOUalphaSSR = zeros(numel(alphas), 1);
 
 for i=1:numel(alphas)
     tic
-    Xt = exDe('TS-OU', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed);
-    timeTSOUalpha(i) = toc;
-    [TCumulantsTSOUalpha(i,:), ECumulantsTSOUalpha(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU');
+    Xt = exDe('TS-OU', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed, 'SSR');
+    timeTSOUalphaSSR(i) = toc;
+    [TCumulantsTSOUalphaSSR(i,:), ECumulantsTSOUalphaSSR(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU');
 end
 
-%% OU-TS
-alpha = 0.7; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
+%% TS-OU VARYING ALPHA DR
+alphas = [0.8, 0.4];
+b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
-tic
-Xt = exDe('OU-TS', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed);
-timeOUTS = toc;
-[TCumulantsOUTS, ECumulantsOUTS] = computeCumulants(Xt(:,end), [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS')
+TCumulantsTSOUalphaDR = zeros(numel(alphas), 4);
+ECumulantsTSOUalphaDR = zeros(numel(alphas), 4);
+timeTSOUalphaDR = zeros(numel(alphas), 1);
 
-%% TS-OU
-alpha = 0.7; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
-
-tic
-Xt = exDe('TS-OU', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed);
-timeTSOU = toc;
-[TCumulantsTSOU, ECumulantsTSOU] = computeCumulants(Xt(:,end), [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU')
+for i=1:numel(alphas)
+    tic
+    Xt = exDe('TS-OU', [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, seed, 'DR');
+    timeTSOUalphaDR(i) = toc;
+    [TCumulantsTSOUalphaDR(i,:), ECumulantsTSOUalphaDR(i,:)] = computeCumulants(Xt(:,end), [alphas(i), b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'TS-OU');
+end

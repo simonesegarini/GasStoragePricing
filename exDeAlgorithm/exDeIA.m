@@ -1,4 +1,4 @@
-function increments = exDeIA(params, dt, nSim, model)
+function increments = exDeIA(params, dt, nSim, model, algo)
 % Compute the increments for TS-OU and OU-TS processes following Algorithm
 % 1 and Algorithm 2 of Sabino & Cufaro Petroni 2022.
 %
@@ -7,7 +7,7 @@ function increments = exDeIA(params, dt, nSim, model)
 % dt:                   time step
 % nSim:                 number of simulations
 % model:                char for model selection
-% seed:                 set the seed of the simulation
+% algo:                 select SSR or DR for the TS simulation
 %
 % OUTPUT:
 % increments:           increments using exact decomposition method
@@ -29,39 +29,16 @@ switch model
         lamb_p = c_p*beta_p^alpha*gamma(1-alpha) * (1 - a^alpha + a^alpha * log(a^alpha)) / (b*alpha^2 * a^alpha);
         lamb_n = c_n*beta_n^alpha*gamma(1-alpha) * (1 - a^alpha + a^alpha * log(a^alpha)) / (b*alpha^2 * a^alpha);
         
-        % Compute X1 by doing a TS simulations.
-        X1p_DR = simulationTS_DR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
-        X1n_DR = simulationTS_DR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
-
-%         X1p_DR = X1p_DR./(c_p^(1/alpha));
-%         X1n_DR = X1n_DR./(c_n^(1/alpha));
-
-        X1p = simulationTS_SSR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
-        X1n = simulationTS_SSR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
-
-        figure
-        subplot(1,2,1)
-        plot(X1p_DR, '.r')
-        title('DR method, positive TS')
-        subplot(1,2,2)
-        plot(X1p, '.b')
-        title('SSR method, positive TS')
-
-        figure
-        subplot(1,2,1)
-        histogram(X1p_DR, 'Normalization', 'pdf')
-        title('DR method, positive TS')
-        subplot(1,2,2)
-        histogram(X1p, 'Normalization', 'pdf')
-        title('SSR method, prositive TS')
-
-        figure
-        subplot(1,2,1)
-        histogram(X1n_DR, 'Normalization', 'pdf')
-        title('DR method, negative TS')
-        subplot(1,2,2)
-        histogram(X1n, 'Normalization', 'pdf')
-        title('SSR method, negative TS')
+        % Compute X1 by doing a TS simulations and using different algorithms.
+        if strcmp(algo, 'DR')
+            X1p = simulationTS_DR(alpha, beta_p/a * ((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                .* (((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            X1n = simulationTS_DR(alpha, beta_n/a * ((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                .* (((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
+        elseif strcmp(algo, 'SSR')
+            X1p = simulationTS_SSR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
+            X1n = simulationTS_SSR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
+        end
 
         % Cumulants to compensate.
         ctsCumulants = computeCumulants(0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], dt, 'OU-CTS')/1000;
@@ -71,9 +48,16 @@ switch model
         lamb_p = c_p*gamma(1-alpha)*beta_p^alpha/alpha * (1 - a^alpha);
         lamb_n = c_n*gamma(1-alpha)*beta_n^alpha/alpha * (1 - a^alpha);
 
-        % Compute X1 by doing a TS simulations.
-        X1p = simulationTS_SSR(alpha, beta_p, c_p*(1-a^alpha), nSim);
-        X1n = simulationTS_SSR(alpha, beta_n, c_n*(1-a^alpha), nSim);
+        % Compute X1 by doing a TS simulations and using different algorithms.
+        if strcmp(algo, 'DR')
+            X1p = simulationTS_DR(alpha, beta_p * ((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                .* (((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            X1n = simulationTS_DR(alpha, beta_n * ((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                .* (((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
+        elseif strcmp(algo, 'SSR')
+            X1p = simulationTS_SSR(alpha, beta_p, c_p*(1-a^alpha), nSim);
+            X1n = simulationTS_SSR(alpha, beta_n, c_n*(1-a^alpha), nSim);
+        end
 
         % Cumulants to compensate.
         ctsCumulants = computeCumulants(0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], dt, 'CTS-OU')/1000;
@@ -141,7 +125,6 @@ for simIt = 1:nSim
 end
 
 % Compute the total increment as return value.
-increments = gamma_c*dt + X1p_DR + X2p - X1n_DR - X2n - ctsCumulants(1);
-% increments = gamma_c*dt + X1p + X2p - X1n - X2n - ctsCumulants(1);
+increments = gamma_c*dt + X1p + X2p - X1n - X2n - ctsCumulants(1);
 
 end

@@ -89,7 +89,7 @@ switch model
         % and CTS-OU simulations used in the ExDe Algorithm, to be coherent
         % with FGMC Algorithm.
         alpha = params(1); b = params(2); beta_p = params(3); beta_n = params(4);
-        c_p = params(5); c_n = params(6); gamma_c = params(7);
+        c_p = params(5); c_n = params(6);
         
         for j = 1:numel(TCumulants)
             TCumulants(j) = c_p * beta_p ^ (alpha - j) .* gamma(j - alpha) ...
@@ -102,6 +102,17 @@ switch model
             end
         end
     case 'Gamma-OU'
-        % vedere .12 di Sabino e Cufaro Petroni
+        % This case is used to compensate the first moment of the Gamma-OU 
+        % simulations used in the ExDe Algorithm, to be coherent with FGMC 
+        % Algorithm.
+        b = params(2); beta_p = params(3); beta_n = params(4);
+        c_p = params(5); c_n = params(6);
+
+        TCumulants(1) = (1-exp(-b*T)) * c_p / beta_p - (1-exp(-b*T)) * c_n / beta_n;
+        TCumulants(2) = (1-exp(-2*b*T)) * c_p / beta_p^2 + (1-exp(-2*b*T)) * c_n / beta_n^2;
+        TCumulants = TCumulants * 1000;
+
+    case default
+        error('Insert correct process.')
 end
 end

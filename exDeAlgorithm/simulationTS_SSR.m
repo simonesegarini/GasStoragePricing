@@ -3,9 +3,9 @@ function TSrv = simulationTS_SSR(alpha, beta, theta, nSim)
 % The algorithm used is the SSR by Qu, Zhao & Dassios 2018.
 %
 % INPUT:
-% alpha:                first parameter of TS
-% beta:                 second parameter of TS
-% theta:                third parameter of TS
+% alpha:                stability parameter
+% beta:                 tempering parameter
+% theta:                scale parameter
 % nSim:                 number of variables to simulate
 %
 % OUTPUT:
@@ -17,8 +17,8 @@ accepted = zeros(nSim, 1);
 
 while sum(accepted) < nSim
 
-    temp = sum(accepted);
-    disp(['SSR: generated = ', num2str(temp)])
+    % temp = sum(accepted);
+    % disp(['SSR: generated = ', num2str(temp)])
 
     % Find idxs where we didn't accept previously.
     to_generate = find(accepted == 0);

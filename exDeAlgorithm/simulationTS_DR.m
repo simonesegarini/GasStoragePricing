@@ -1,17 +1,14 @@
-function TSrv = simulationTS_DR(alpha, lambda, theta, nSim)
+function TSrv = simulationTS_DR(alpha, lambda, nSim)
 % Simulation of a TS random variable. 
 % The algorithm used is the DR by Devroye 2009.
 %
 % INPUT:
-% alpha:                first parameter of TS
-% beta:                 second parameter of TS
-% theta:                third parameter of TS
+% alpha:                stability parameter
+% lambda:               tempering parameter
 % nSim:                 number of variables to simulate
 %
 % OUTPUT:
 % TSrv:                 TS simulated variables
-
-lambda = lambda.*theta^(1/alpha);
 
 % Set up the parameters from Devroye 2009.
 gamma = lambda^alpha * alpha * (1-alpha);
@@ -28,17 +25,14 @@ accepted_outer = zeros(nSim, 1);
 S = @(x) sin(x)./x;
 A = @(x) ((sin(alpha.*x).^alpha .* sin((1-alpha).*x).^(1-alpha)) ...
     ./ (sin(x))) .^ (1/(1-alpha));
-% B = @(x) 1./(A(x).^(1-alpha));
-% B0 = alpha^(-alpha) * (1-alpha)^(-(1-alpha));
-
 BoverB0 = @(x) S(x)./((S(alpha.*x).^alpha) .* (S((1-alpha).*x).^(1-alpha)));
 
-% Now working on the inner repeat of Devroye
-
+% Allocate for memory efficiency.
 X = zeros(nSim, 1);
 
 while sum(accepted_outer) < nSim
 
+    % Allocate for memory efficiency.
     X_temp = zeros(nSim - sum(accepted_outer), 1);
 
     % Generate U with density proportional to g**.
@@ -102,15 +96,13 @@ while sum(accepted_outer) < nSim
     
     end
 
-    % figure
-    % histogram(W.*rho, 'Normalization','pdf')
     % Define Z, useful for later.
     Z = W.*rho;
 
     % Find idxs where we didn't accept previously.
     to_generate_outer = find(accepted_outer == 0);
-    temp_out = sum(accepted_outer);
-    disp(['DR: generated outer = ', num2str(temp_out)])
+    % temp_out = sum(accepted_outer);
+    % disp(['DR: generated outer = ', num2str(temp_out)])
 
     % Generate X with density proportional to g(x,U).
     % Set up constants.
@@ -151,6 +143,5 @@ while sum(accepted_outer) < nSim
     X(to_generate_outer(to_accept_outer)) = X_temp(to_accept_outer);
 
 end
-
-TSrv = 1./(X.^b) * theta.^alpha;
+TSrv = 1./(X.^b);
 end
