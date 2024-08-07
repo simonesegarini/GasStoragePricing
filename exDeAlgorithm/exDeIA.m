@@ -95,8 +95,8 @@ switch model
         Usp = rand(nSim, nP);
         Usn = rand(nSim, nN);
 
-        Vp = (1 + (a^(-alpha) - 1)./(alpha) .* Usp).^(1/alpha);
-        Vn = (1 + (a^(-alpha) - 1)./(alpha) .* Usn).^(1/alpha);
+        Vp = (1 + (a^(-alpha) - 1) .* Usp).^(1/alpha);
+        Vn = (1 + (a^(-alpha) - 1) .* Usn).^(1/alpha);
 end
 
 % Adjust the values of beta_p and beta_n.

@@ -10,8 +10,8 @@ a = exp(-b*dt);
 Vs = zeros(nSim, 1);
 
 % Define the PDF of W.
-fW = @(w) log(a^(-alpha)) * (exp(w * log(a^(-alpha))) - 1) ...
-    \ (a^(-alpha) - 1 - log(a^(-alpha)));
+fW = @(w) -a.^alpha .* log(a.^alpha) ./ (1 - a.^alpha + a.^alpha...
+    .* log(a.^alpha)) * (a.^(-alpha.*w) - 1);
 
 % Discretization of the w values for fW.
 L = 100;

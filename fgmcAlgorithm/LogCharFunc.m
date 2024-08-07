@@ -78,10 +78,10 @@ switch model
 
             elseif alpha == 1 % Second OU-TS special case.
                 integral_values1 = integral(@(z) (1-1i.*us./z).*log(1-1i.*us./z)./z, beta_p, beta_p*exp(b*t), 'ArrayValued', true);
-                integral_values2 = integral(@(z) (1-1i.*us./z).*log(1-1i.*us./z)./z, beta_n, beta_n*exp(b*t), 'ArrayValued', true);
+                integral_values2 = integral(@(z) (1+1i.*us./z).*log(1+1i.*us./z)./z, beta_n, beta_n*exp(b*t), 'ArrayValued', true);
 
-                values = 1i.*us.*(1-exp(-b.*t))./b.*(gamma_c + c_p + c_n) + ...
-                                        c_p.*beta_p./b.*integral_values1.' + c_n.*beta_n./b.*integral_values2.';
+                values = 1i.*us.*(1-exp(-b.*t))./b.*(gamma_c + c_p - c_n) + ...
+                                        c_p.*beta_p./b.*integral_values1 + c_n.*beta_n./b.*integral_values2;
             
             else % General OU-TS case.
                 integral_values1 = integral(@(z) (z-1i*us).^alpha./z.^(alpha+1), beta_p, beta_p*exp(b*t), 'ArrayValued', true);
@@ -95,7 +95,6 @@ switch model
             end
 
         % Finite activity case, use Algorithm 2. 
-        % (Try to figure out how to use the mu(t) parameter)
         elseif strcmp(activity, 'Finite')
             integral_values_p = integral(@(z) (z-1i.*us).^alpha./(z.^(alpha+1)), beta_p, beta_p*exp(b*t), 'ArrayValued', true);
             integral_values_n = integral(@(z) (z+1i.*us).^alpha./(z.^(alpha+1)), beta_n, beta_n*exp(b*t), 'ArrayValued', true);
@@ -120,21 +119,29 @@ switch model
         if strcmp(activity, 'Infinite')
 
             if alpha == 1 % Second TS-OU special case. (Need to be fixed cause c_n is missing)
-                values = 1i.*us.*(1-exp(-b*t)).*(gamma_c+c_p) + ...
+                values = 1i.*us.*(1-exp(-b*t)).*(gamma_c+c_p-c_n) + ...
                     c_p*beta_p*((1- 1i.*us./beta_p).*log(1- 1i.*us./beta_p) - ...
-                    (1-1i.*us.*exp(-b*t)./beta_p).*log(1-1i.*us.*exp(-b*t)./beta_p));
+                    (1-1i.*us.*exp(-b*t)./beta_p).*log(1-1i.*us.*exp(-b*t)./beta_p)) + ...
+                    c_n*beta_n*((1+ 1i.*us./beta_n).*log(1+ 1i.*us./beta_n) - ...
+                    (1+1i.*us.*exp(-b*t)./beta_n).*log(1+1i.*us.*exp(-b*t)./beta_n));
 
             else % General case. (This one correctly implemented)
                 values = psiXTS(us, params) - psiXTS(us*exp(-b*t), params);
             end
         
-        % Gamma-OU case. (Need to be fixed cause c_n is missing)
+        % Gamma-OU case.
         elseif strcmp(activity, 'Finite') 
-            integral_values = integral(@(z) 1./(z-1i.*us), beta_p, beta_p*exp(b*t), 'ArrayValued', true);
-            
-            aux_values = 1./(b*t).*integral_values;
-            lamb = c_p.*b;
-            values = log((exp(lamb.*t.*aux_values)-1)./(exp(lamb.*t)-1));
+            integral_values_p = integral(@(z) 1./(z-1i.*us), beta_p, beta_p*exp(b*t), 'ArrayValued', true);
+            integral_values_n = integral(@(z) 1./(z+1i.*us), beta_n, beta_n*exp(b*t), 'ArrayValued', true);
+
+            phiJ_p = 1./(b*t).*integral_values_p;
+            phiJ_n = 1./(b*t).*integral_values_n;
+
+            lamb_p = c_p*b;
+            lamb_n = c_n*b; 
+            lamb = lamb_p+lamb_n;
+            phiJ = lamb_p/lamb.*phiJ_p  + lamb_n/lamb.*phiJ_n; 
+            values = log((exp(lamb*t.*phiJ) - 1)./(exp(lamb*t) - 1));
         end
      
 end

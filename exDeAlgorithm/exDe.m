@@ -18,7 +18,7 @@ function X = exDe(model, params, N, M, T, seed, algo)
 dt = T/M;
 alpha = params(1); b = params(2);
 
-% Set seed for reprudicibility.
+% Set seed for reproducibility.
 if nargin == 6
     rng(seed);
 end

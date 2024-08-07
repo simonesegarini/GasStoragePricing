@@ -47,10 +47,9 @@ while sum(accepted_outer) < nSim
     while sum(accepted_inner) < (nSim - sum(accepted_outer))
         
         U_temp = zeros(nSim - sum(accepted_inner) - sum(accepted_outer),1);
+
         % Find idxs where we didn't accept previously.
         to_generate_inner = find(accepted_inner == 0);
-%         temp_in = sum(accepted_inner);
-%         disp(['Generated inner = ', num2str(temp_in)])
         
         % Generate V, W_first uniformly in [0,1].
         V = rand(size(to_generate_inner));
@@ -101,8 +100,6 @@ while sum(accepted_outer) < nSim
 
     % Find idxs where we didn't accept previously.
     to_generate_outer = find(accepted_outer == 0);
-    % temp_out = sum(accepted_outer);
-    % disp(['DR: generated outer = ', num2str(temp_out)])
 
     % Generate X with density proportional to g(x,U).
     % Set up constants.
@@ -143,5 +140,6 @@ while sum(accepted_outer) < nSim
     X(to_generate_outer(to_accept_outer)) = X_temp(to_accept_outer);
 
 end
+
 TSrv = 1./(X.^b);
 end
