@@ -79,8 +79,7 @@ switch model
                             l = (c_p + c_n) * pi / 2 * (1 - exp(-b * dt));
                         else % GENERAL TS-OU CASE.
                             omega = alpha;
-                            scale = 1;
-                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) * scale^alpha;
+                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt));
                         end
                     end
                     du = (2 * pi * abs(a) / (l * N^omega))^(1 / (omega + 1));

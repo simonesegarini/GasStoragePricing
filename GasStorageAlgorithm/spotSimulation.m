@@ -1,4 +1,4 @@
-function X = spotSimulation(model, params, N, M, T, Mfft, seed, scaling_fact, alg)
+function [S, SAV] = spotSimulation(S0, model, params, nSim, M, T, Mfft, seed)
 % Spot simulation based on model selected: OU returns 2*M simulations by
 % using AV algorithm, OU-NTS and OU-TS return M simulations using fgmc
 % algorithm
@@ -10,30 +10,48 @@ function X = spotSimulation(model, params, N, M, T, Mfft, seed, scaling_fact, al
 % M:                    number of timesteps
 % T:                    time horizon
 % Mfft:                 parameter for FFT
-% seed:                 set the seed of the simulation
-% scaling_fact:         parameter to stretch the CDF and handle low alphas
-% alg:                  algorithm selection (optional)
+% seed:                 set the seed of the simulation (optional)
 %
 % OUTPUT:
 % X:                    logprice from t = 0 to t = T+1
 
-switch model
-    case 'OU'
-        X = spotSimulationOU(params, N, M, T, seed);
-
-    case {'OU-NTS', 'NTS-OU'}
-        X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact);
-
-    case {'OU-TS', 'TS-OU'}
-        if nargin == 9
-            switch alg
-                case 'fgmc'
-                    X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact);
-                case 'exde'
-                    X = exDe(model, params, N, M, T, seed);
-            end
-        else
-            X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact);
-        end
+if nargin == 7
+    rng(seed)
 end
+
+switch model
+    case 1 % OU
+        Xs = spotSimulationOU(params, nSim, M, T);
+
+    case 21 % OU-TS FGMC
+        Xs = fgmc('OU-TS', params, nSim, M, T, Mfft);
+
+    case 22 % OU-TS EXDE SSR
+        Xs = exDe('OU-TS', params, nSim, M, T, 'SSR');
+
+    case 23 % OU-TS EXDE DR
+        Xs = exDe('OU-TS', params, nSim, M, T, 'DR');
+
+    case 31 % TS-OU FGMC
+        Xs = fgmc('TS-OU', params, nSim, M, T, Mfft);
+
+    case 32 % TS-OU EXDE SSR
+        Xs = exDe('TS-OU', params, nSim, M, T, 'SSR');
+
+    case 33 % TS-OU EXDE DR
+        Xs = exDe('TS-OU', params, nSim, M, T, 'DR');
+
+    case 4 % OU-NTS FGMC
+        Xs = fgmc('OU-NTS', params, nSim, M, T, Mfft);
+
+    case 5 % NTS-OU FGMC
+        Xs = fgmc('NTS-OU', params, nSim, M, T, Mfft);
+
+    otherwise
+        error('Select a valid model for underlyings simulation.')
+end
+
+X = Xs(1:nSim, :); XAV = Xs(nSim+1:end, :);
+S = S0*exp(X);
+SAV = S0*exp(XAV);
 end

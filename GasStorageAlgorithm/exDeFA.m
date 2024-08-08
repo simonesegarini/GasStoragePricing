@@ -12,7 +12,6 @@ function increments = exDeFA(params, dt, nSim, model)
 % OUTPUT:
 % increments:           increments using exact decomposition method
 
-
 % Assign parameters.
 alpha = params(1); b = params(2); beta_p = params(3);
 beta_n = params(4); c_p = params(5); c_n = params(6);
@@ -20,6 +19,8 @@ gamma_c = params(7);
 
 % As exDe Algortihm of Sabino, we decompose X(t) = aX0 + X1.
 % aX0 is already computed in the update rule of exDe.
+
+a = exp(-b*dt);
 
 switch model
     case 'OU-TS'
@@ -72,31 +73,12 @@ switch model
 
     % The TS-OU process is a finite activity only if alpha = 0 i.e. it is a gamma-OU.
     case 'TS-OU' 
-        % Sabino scrive gamma-ou(k, lambda, beta), k è b
-
-        a = exp(-b*dt);
-        alphap = lamb_p/k;
-        alphan = lamb_n/k;
-
-%         % Generate Polya random variables.
-%         Bp = simulationPolya(alphap, 1-a, nSim);
-%         Bn = simulationPolya(alphan, 1-a, nSim);
-% 
-%         % Generate the increments as Erlang random variables.
-%         X1p = simulationErlang(Bp, betap/a, nSim);
-%         X1n = simulationErlang(Bn, betan/a, nSim);
-
-        
-        % shape parameter == alpha;
-        % rate = beta;
-        Bp = nbinrnd(alphap, a,  size(nSim));
-        Bn = nbinrnd(alphan, a,  size(nSim));
-        
-        X1p = gamrnd(Bp, a/betap, size(nSim));
-        X1n = gamrnd(Bn, a/betan, size(nSim));
+        % Simulate the positive and negative processes as Polya mixtures.
+        X1p = simulationPolyaMixture(c_p, beta_p, a, nSim);
+        X1n = simulationPolyaMixture(c_n, beta_n, a, nSim);
+        ctsCumulants = computeCumulants(0, [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], dt, 'Gamma-OU')/1000;
 end
 
 % Compute the total increment as return value.
-% increments = gamma_c*dt + X1p - X1n - cumulants_p(1) + cumulants_n(1);
 increments = gamma_c*dt + X1p - X1n - ctsCumulants(1);
 end

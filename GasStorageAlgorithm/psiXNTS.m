@@ -18,9 +18,5 @@ k = params(4); theta = params(5);
 % General case.
 if alpha ~= 0
     values = (1-alpha)/(k*alpha)*(1 - (1 - 1i.*k/(1-alpha)*(theta.*us + 1i.*us.^2.*sigma^2/2)).^alpha);
-
-% Variance Gamma
-elseif alpha == 0
-    values = -1/k.*log(0.5*sigma^2.*us.^2.*k - 1i*theta*k.*us + 1);
 end
 end

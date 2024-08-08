@@ -1,4 +1,4 @@
-function Xs = spotSimulationOU(params, N, M, T, seed)
+function Xs = spotSimulationOU(params, N, M, T)
 % Simulation of the Spot price with a mean reverting model, using also AV
 %
 % INPUT:
@@ -6,14 +6,11 @@ function Xs = spotSimulationOU(params, N, M, T, seed)
 % N:                    number of paths
 % M:                    number of timesteps
 % T:                    last day of Spot trading
-% seed:                 (optional) fix the randomness to a specific seed
 %
 % OUTPUT:
 % Xs:                   logprice from t = 0 to t = T+1
 
-% Set given seed.
-rng(seed)
-
+% Set up parameters.
 dt = T/M; % daily simulation
 sigma = params(1); k = params(2); A = params(3); B = params(4);
 mu = @(t) A.*cos(2.*pi.*t./T) + B;
@@ -31,6 +28,4 @@ for j=1:M
 end
 
 Xs = [X; XAV];
-% checkAntitheticCovariance(X, XAV);
-
 end

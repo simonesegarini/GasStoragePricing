@@ -14,6 +14,8 @@ function cashflows = priceOut(S, cashflows, betas, h, N, M, rates, alpha, T, max
 % T:                    last day of Spot trading
 % maxInjection:         matrix with max injection values for all discr volumes
 % maxWithdraw:          matrix with max withdraw values for all discr volumes
+% numKnots:             number of knots for B-spline or polynomial degree + 1 for polynomial regression
+% method:               'polynomial' or 'bspline' for regression type
 %
 % OUTPUT:
 % cashflows:            matrix with the cashflows at t0

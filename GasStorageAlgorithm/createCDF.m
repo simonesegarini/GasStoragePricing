@@ -1,4 +1,4 @@
-function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, scaling_fact)
+function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity)
 % Function that creates the approximated CDF of the increments.
 %
 % INPUT:
@@ -7,7 +7,6 @@ function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, sca
 % dt:                   time horizon
 % model:                char for model selection
 % activity:             char for model selection
-% scaling_fact:         parameter to stretch the CDF and handle low alphas
 %
 % OUTPUT:
 % xgrid_hat:            grid for the x values
@@ -37,7 +36,7 @@ xgrid = xgrid(xgrid >= -20 & xgrid <= 20);
 
 % FFT to retrieve the CDF on the xgrid.
 % First assign the function for the FFT.
-f = @(u) exp(LogCharFunc(scaling_fact .* (u + 1i .* a), dt, params, model, activity))./ (1i .* (u + 1i .* a));
+f = @(u) exp(LogCharFunc(u + 1i .* a, dt, params, model, activity))./ (1i .* (u + 1i .* a));
 
 I_fft = computeFFT(f, xgrid, numericalParams);
 RawCDF = Ra - exp(a .* xgrid) ./ (2 * pi) .* I_fft;
