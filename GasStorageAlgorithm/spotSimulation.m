@@ -15,7 +15,7 @@ function [S, SAV] = spotSimulation(S0, model, params, nSim, M, T, Mfft, seed)
 % OUTPUT:
 % X:                    logprice from t = 0 to t = T+1
 
-if nargin == 7
+if nargin == 8
     rng(seed)
 end
 

@@ -98,14 +98,11 @@ else
         end
 
         [price, ~, CI] = normfit(0.5*(cashflows(:,index_V0) + cashflowsAV(:,index_V0)));
-        SE = standardError(0.5*(cashflows(:,index_V0) + cashflowsAV(:,index_V0)));
+        SE= standardError(0.5*(cashflows(:,index_V0) + cashflowsAV(:,index_V0)));
 
 
     elseif ~AV
-        % SIMULATION OF UNDERLYINGS.
         spotSimulated = spotSimulation(contract.SpotInitial, gasProcess, parameters, numberSimulations, M, T, 16, seed);
-
-        % BACKWARD INDUCTION TO PRICE.
         cashflows_T = penFunc(spotSimulated(:,end), ones(numberSimulations,1)*dV');
 
         switch contract.Regression
@@ -118,9 +115,11 @@ else
         end
 
         [price, ~, CI] = normfit(cashflows(:,index_V0));
-        SE = standardError(cashflows(:,index_V0));
+        SE= standardError(cashflows(:,index_V0));
     end
 end
+
+
 time = toc;
 
 if numberSimulations < 50
@@ -130,8 +129,5 @@ else
 end
 
 plotSpot(simulationsPlot, spotSimulated, gasProcess, 0)
-if AV
-    plotPriceDistribution(0.5*(cashflows(:,index_V0) + cashflowsAV(:,index_V0)), numberSimulations, gasProcess, parameters(1), 0)
-elseif ~AV
-    plotPriceDistribution(cashflows(:,index_V0), numberSimulations, gasProcess, parameters(1), 0)
+plotPriceDistribution(0.5*(cashflows(:,index_V0) + cashflowsAV(:,index_V0)), numberSimulations, gasProcess, parameters(1), 0)
 end

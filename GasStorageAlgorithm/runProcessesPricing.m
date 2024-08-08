@@ -47,7 +47,7 @@ contract.Costs.SpreadProfit = 0; %b2
 % [alpha, b, sigma, k, theta].
 % If OU-TS or TS-OU are selected, parameters should be given as 
 % [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c].
-contract.GasProcess = OU_TS_FGMC;
+contract.GasProcess = OU_TS_SSR;
 contract.GasParameters = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0];
 
 % RATES SIMULATIONS.
@@ -67,7 +67,7 @@ contract.Order = 4;
 %% PRICE
 [contract.Price, contract.CI, contract.SE, contract.ExecutionTime] = storagePricing(contract);
 
-disp(['Contract price: ', num2str(contract.Price / 1e6, '%.4f'), ' million euros.'])
-disp(['Contract price CI: (', num2str(contract.CI(1) / 1e6, '%.4f'), ', ', num2str(contract.CI(2) / 1e6, '%.4f'), ') million euros.'])
-disp(['Contract price SE: ', num2str(contract.SE / 1e3, '%.4f'), ' thousand euros.'])
+disp(['Contract price: ', num2str(contract.Price / 1e6, '%.3f'), ' million euros.'])
+disp(['Contract price CI: (', num2str(contract.CI(1) / 1e6, '%.3f'), ', ', num2str(contract.CI(2) / 1e6, '%.3f'), ') million euros.'])
+disp(['Contract price SE: ', num2str(contract.SE / 1e3, '%.3f'), ' thousand euros.'])
 disp(['Running time: ', num2str(contract.ExecutionTime, '%.2f'), ' seconds.'])
