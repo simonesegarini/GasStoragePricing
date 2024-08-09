@@ -73,4 +73,9 @@ if ~isfield(contract, 'Order') || isempty(contract.Order)
     error('Invalid setting, check contract.Order field.')
 end
 
+% Check for AV part.
+if ~isfield(contract, 'AV') || isempty(contract.AV)
+    error('Invalid setting, check contract.AV field.')
+end
+
 end

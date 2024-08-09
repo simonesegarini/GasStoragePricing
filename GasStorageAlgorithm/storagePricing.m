@@ -68,9 +68,8 @@ ratesSimulated = simulateInterestRatePaths(ratesModel, r0, ratesParameters, numb
 % Check if the process allows AV method.
 gasProcess = contract.GasProcess;
 parameters = contract.GasParameters;
-if (gasProcess == 1 || gasProcess == 21 || gasProcess == 31 || gasProcess == 4 || gasProcess == 5)
-    AV = true;
-else
+AV = logical(contract.AV);
+if (gasProcess == 22 || gasProcess == 23 || gasProcess == 32 || gasProcess == 33)
     AV = false;
 end
 

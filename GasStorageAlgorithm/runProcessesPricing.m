@@ -2,11 +2,16 @@ clear all, close all, clc
 
 %% Set up FLAGS for processes.
 OU = 1; 
+
 OU_TS_FGMC = 21; TS_OU_FGMC = 31; 
-OU_TS_SSR = 22; TS_OU_SR = 32;
+OU_TS_SSR = 22; TS_OU_SSR = 32;
 OU_TS_DR = 23; TS_OU_DR = 33;
 
 OU_NTS = 4; NTS_OU = 5;
+
+%% Set up FLAGS for Antithetic Variable
+AV_YES = 1;
+AV_NO = 0;
 
 %% Set up FLAGS for regression.
 POLYNOMIAL = 1;
@@ -47,8 +52,9 @@ contract.Costs.SpreadProfit = 0; %b2
 % [alpha, b, sigma, k, theta].
 % If OU-TS or TS-OU are selected, parameters should be given as 
 % [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c].
-contract.GasProcess = OU_TS_SSR;
+contract.GasProcess = TS_OU_FGMC;
 contract.GasParameters = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0];
+contract.AV = AV_YES;
 
 % RATES SIMULATIONS.
 % CIR, Vasicek, NULL (zeros) simulations available, give proper parameters.
