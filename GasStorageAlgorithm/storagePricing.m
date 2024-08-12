@@ -16,7 +16,7 @@ function [price, CI, SE, time] = storagePricing(contract)
 if isfield(contract, 'Seed') && ~isempty(contract.Seed)
     seed = contract.Seed;
 else
-    seed = randi(10000); % Generate a random seed between 1 and 10000
+    seed = randi(10000); % Generate a random seed between 1 and 10000.
 end
 
 % Check general struct of the contract.

@@ -8,7 +8,7 @@ N = 1e7; % Number of simulations
 seed = 2; % Seed for the random sampling
 
 %% OU-TS VARYING ALPHA SSR
-alphas = [0.8, 0.4, -1.0, -2.0];
+% alphas = [0.8, 0.4, -1.0, -2.0];
 alphas = [0.4, -1.0, -2.0];
 b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 

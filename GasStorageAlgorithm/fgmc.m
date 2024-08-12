@@ -1,4 +1,4 @@
-function Xs = fgmc(model, params, N, M, T, Mfft, seed)
+function Xs = fgmc(model, params, N, M, T, Mfft)
 % Finite General Monte Carlo algorithm for OU-Lévy and Lévy-OU processes.
 %
 % INPUT:
@@ -8,8 +8,6 @@ function Xs = fgmc(model, params, N, M, T, Mfft, seed)
 % M:                    number of timesteps
 % T:                    time horizon
 % Mfft:                 FFT hyperparameter
-% seed:                 set the seed of the simulation
-% scaling_fact:         parameter to stretch the CDF and handle low alphas
 %
 % OUTPUT:
 % X:                    logprices
