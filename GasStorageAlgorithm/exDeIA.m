@@ -22,6 +22,10 @@ gamma_c = params(7);
 % aX0 is already computed in the update rule of exDe.
 
 a = exp(-b*dt);
+scale = 1;
+
+% Check if a GPU is available.
+useGPU = gpuDeviceCount > 0;
 
 switch model
     case 'OU-TS'
@@ -31,13 +35,33 @@ switch model
         
         % Compute X1 by doing a TS simulations and using different algorithms.
         if strcmp(algo, 'DR')
-            X1p = simulationTS_DR(alpha, beta_p/a * ((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
-                .* (((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
-            X1n = simulationTS_DR(alpha, beta_n/a * ((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
-                .* (((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            if useGPU
+                % GPU version of DR algorithm.
+                X1p = simulationTS_DR_GPU(alpha, beta_p/a * ((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
+                X1n = simulationTS_DR_GPU(alpha, beta_n/a * ((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            else
+                % CPU version of DR algorithm.
+                X1p = simulationTS_DR(alpha, beta_p/a * ((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
+                X1n = simulationTS_DR(alpha, beta_n/a * ((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            end
         elseif strcmp(algo, 'SSR')
-            X1p = simulationTS_SSR(alpha, beta_p/a, c_p*(1-a^alpha)/(alpha*b), nSim);
-            X1n = simulationTS_SSR(alpha, beta_n/a, c_n*(1-a^alpha)/(alpha*b), nSim);
+            if useGPU
+                % GPU version of SSR algorithm.
+                X1p = simulationTS_SSR_GPU(alpha, beta_p/a * (c_p*(1-a^alpha)/(alpha*b)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_p*(1-a^alpha)/(alpha*b)/scale)^(1/alpha);
+                X1n = simulationTS_SSR_GPU(alpha, beta_n/a * (c_n*(1-a^alpha)/(alpha*b)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_n*(1-a^alpha)/(alpha*b)/scale)^(1/alpha);
+            else
+                % CPU version of SSR algorithm.
+                X1p = simulationTS_SSR(alpha, beta_p/a * (c_p*(1-a^alpha)/(alpha*b)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_p*(1-a^alpha)/(alpha*b)/scale)^(1/alpha);
+                X1n = simulationTS_SSR(alpha, beta_n/a * (c_n*(1-a^alpha)/(alpha*b)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_n*(1-a^alpha)/(alpha*b)/scale)^(1/alpha);
+            end
         end
 
         % Cumulants to compensate.
@@ -50,13 +74,33 @@ switch model
 
         % Compute X1 by doing a TS simulations and using different algorithms.
         if strcmp(algo, 'DR')
-            X1p = simulationTS_DR(alpha, beta_p * ((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
-                .* (((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
-            X1n = simulationTS_DR(alpha, beta_n * ((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
-                .* (((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            if useGPU
+                % GPU version of DR algorithm.
+                X1p = simulationTS_DR_GPU(alpha, beta_p * ((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
+                X1n = simulationTS_DR_GPU(alpha, beta_n * ((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            else
+                % CPU version of DR algorithm.
+                X1p = simulationTS_DR(alpha, beta_p * ((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
+                X1n = simulationTS_DR(alpha, beta_n * ((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
+                    .* (((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
+            end
         elseif strcmp(algo, 'SSR')
-            X1p = simulationTS_SSR(alpha, beta_p, c_p*(1-a^alpha), nSim);
-            X1n = simulationTS_SSR(alpha, beta_n, c_n*(1-a^alpha), nSim);
+            if useGPU
+                % GPU version of SSR algorithm.
+                X1p = simulationTS_SSR_GPU(alpha, beta_p * (c_p*(1-a^alpha)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_p*(1-a^alpha)/scale)^(1/alpha);
+                X1n = simulationTS_SSR_GPU(alpha, beta_n * (c_n*(1-a^alpha)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_n*(1-a^alpha)/scale)^(1/alpha);
+            else
+                % CPU version of SSR algorithm.
+                X1p = simulationTS_SSR(alpha, beta_p * (c_p*(1-a^alpha)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_p*(1-a^alpha)/scale)^(1/alpha);
+                X1n = simulationTS_SSR(alpha, beta_n * (c_n*(1-a^alpha)/scale)^(1/alpha), scale, nSim) ...
+                    * (c_n*(1-a^alpha)/scale)^(1/alpha);
+            end
         end
 
         % Cumulants to compensate.

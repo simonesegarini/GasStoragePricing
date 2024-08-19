@@ -17,8 +17,8 @@ accepted = zeros(nSim, 1);
 
 while sum(accepted) < nSim
 
-%     temp = sum(accepted);
-%     disp(['SSR: generated = ', num2str(temp)])
+    temp = sum(accepted);
+    disp(['SSR: generated = ', num2str(temp)])
 
     % Find idxs where we didn't accept previously.
     to_generate = find(accepted == 0);

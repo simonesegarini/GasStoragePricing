@@ -10,7 +10,7 @@ OU_NTS = 4; NTS_OU = 5;
 %% Define the struct for processes simulations.
 
 simulation.Simulations = 1e7; % Number of paths simulated.
-simulation.Maturity = 1; % Maturity expressed in years.
+simulation.Maturity = 1/12; % Maturity expressed in years.
 simulation.Steps = 1; % Steps for simulation.
 simulation.Seed = 2; % Seed for the rng, NOT mandatory.
 
@@ -28,6 +28,7 @@ simulation.Process = OU_TS_SSR;
 simulation.Parameters = [0.1, 2.5, 3.5, 0.5, 1, 0]; % Parameters for TS.
 % simulation.Parameters = [0.2162, 0.201, 0.256, 0]; % Parameters for NTS.
 simulation.Alphas = [0.8, 0.4, -1.0, -2.0];
+% simulation.Alphas = [0.8];
 
 %% Run the algorithm
 
@@ -35,3 +36,5 @@ simulation.Alphas = [0.8, 0.4, -1.0, -2.0];
     = simulationAlgorithms(simulation);
 
 displaySimulationResults(simulation)
+%% Save the environment
+save('simulation_environment.mat')
