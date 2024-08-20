@@ -78,4 +78,23 @@ if ~isfield(contract, 'AV') || isempty(contract.AV)
     error('Invalid setting, check contract.AV field.')
 end
 
+% Check for the GPU part.
+if ~isfield(contract, 'GPU') || isempty(contract.GPU)
+    error('Invalid setting, check contract.GPU field.')
+else
+    if contract.GPU == 1
+        % Check if Parallel Computing Toolbox is installed
+        v = ver;
+        if ~any(strcmp({v.Name}, 'Parallel Computing Toolbox'))
+            error('Parallel Computing Toolbox is not installed.');
+        end
+        
+        % Check if a GPU is available
+        g = gpuDeviceCount;
+        if g == 0
+            error('No GPU device found.');
+        end
+    end
+end
+
 end

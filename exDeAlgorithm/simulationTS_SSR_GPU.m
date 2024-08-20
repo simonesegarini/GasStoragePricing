@@ -18,8 +18,8 @@ accepted = gpuArray.false(nSim, 1);  % Boolean array for accepted samples
 % Loop until all samples are accepted
 while ~all(accepted)
 
-    % temp = sum(accepted);
-    % disp(['SSR: generated = ', num2str(temp)])
+    temp = sum(accepted);
+    disp(['SSR: generated = ', num2str(temp)])
     % Find indices of unaccepted samples
     to_generate = find(~accepted);
 

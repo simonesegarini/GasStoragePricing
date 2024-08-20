@@ -1,4 +1,4 @@
-function X = exDe(model, params, N, M, T, algo)
+function X = exDe(model, params, N, M, T, algo, GPU_flag)
 % Exact Decomposition algorithm for OU-TS and TS-OU processes.
 %
 % INPUT:
@@ -7,7 +7,7 @@ function X = exDe(model, params, N, M, T, algo)
 % N:                    number of simulations
 % M:                    number of timesteps
 % T:                    time horizon
-% seed:                 set the seed of the simulation
+% algo:                 algorithm to be used
 %
 % OUTPUT:
 % X:                    logprices
@@ -45,7 +45,7 @@ end
 % Compute Zt based on the type of process.
 if strcmp(activity, 'Infinite')
     for j = 1:M
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeIA(params, dt, N, model, algo);
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + exDeIA(params, dt, N, model, algo, GPU_flag);
     end       
 elseif strcmp(activity, 'Finite')
     for j = 1:M

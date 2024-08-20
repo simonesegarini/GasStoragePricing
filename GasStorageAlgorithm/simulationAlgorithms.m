@@ -46,13 +46,13 @@ for i=1:numel(simulation.Alphas)
         case 22
             tic
             X = exDe('OU-TS', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 'SSR');
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 'SSR', simulation.GPU);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'OU-TS');
         case 23
             tic
             X = exDe('OU-TS', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 'DR');
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 'DR', simulation.GPU);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'OU-TS');
         case 31
@@ -64,13 +64,13 @@ for i=1:numel(simulation.Alphas)
         case 32
             tic
             X = exDe('TS-OU', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 'SSR');
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 'SSR', simulation.GPU);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'TS-OU');
         case 33
             tic
             X = exDe('TS-OU', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 'DR');
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 'DR', simulation.GPU);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'TS-OU');
         case 4

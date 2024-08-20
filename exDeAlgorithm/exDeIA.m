@@ -24,8 +24,14 @@ gamma_c = params(7);
 a = exp(-b*dt);
 scale = 1;
 
-% Check if a GPU is available.
-useGPU = gpuDeviceCount > 0;
+% Check if the Parallel Computing Toolbox is installed
+if license('test', 'Distrib_Computing_Toolbox')
+    % Check if a GPU is available
+    useGPU = gpuDeviceCount > 0;
+else
+    % If the Parallel Computing Toolbox is not installed, set useGPU to false
+    useGPU = false;
+end
 
 switch model
     case 'OU-TS'

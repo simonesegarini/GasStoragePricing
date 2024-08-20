@@ -1,4 +1,4 @@
-function increments = exDeIA(params, dt, nSim, model, algo)
+function increments = exDeIA(params, dt, nSim, model, algo, GPU_flag)
 % Compute the increments for TS-OU and OU-TS processes following Algorithm
 % 1 and Algorithm 2 of Sabino & Cufaro Petroni 2022.
 %
@@ -24,9 +24,6 @@ gamma_c = params(7);
 a = exp(-b*dt);
 scale = 1;
 
-% Check if a GPU is available.
-useGPU = gpuDeviceCount > 0;
-
 switch model
     case 'OU-TS'
         % Compute parameters for the poisson rv.
@@ -35,7 +32,7 @@ switch model
         
         % Compute X1 by doing a TS simulations and using different algorithms.
         if strcmp(algo, 'DR')
-            if useGPU
+            if GPU_flag
                 % GPU version of DR algorithm.
                 X1p = simulationTS_DR_GPU(alpha, beta_p/a * ((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
                     .* (((c_p*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
@@ -49,7 +46,7 @@ switch model
                     .* (((c_n*(1-a^alpha)/(alpha*b))*gamma(1-alpha)/alpha) ^ (1/alpha));
             end
         elseif strcmp(algo, 'SSR')
-            if useGPU
+            if GPU_flag
                 % GPU version of SSR algorithm.
                 X1p = simulationTS_SSR_GPU(alpha, beta_p/a * (c_p*(1-a^alpha)/(alpha*b)/scale)^(1/alpha), scale, nSim) ...
                     * (c_p*(1-a^alpha)/(alpha*b)/scale)^(1/alpha);
@@ -74,7 +71,7 @@ switch model
 
         % Compute X1 by doing a TS simulations and using different algorithms.
         if strcmp(algo, 'DR')
-            if useGPU
+            if GPU_flag
                 % GPU version of DR algorithm.
                 X1p = simulationTS_DR_GPU(alpha, beta_p * ((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha), nSim) ...
                     .* (((c_p*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
@@ -88,7 +85,7 @@ switch model
                     .* (((c_n*(1-a^alpha))*gamma(1-alpha)/alpha) ^ (1/alpha));
             end
         elseif strcmp(algo, 'SSR')
-            if useGPU
+            if GPU_flag
                 % GPU version of SSR algorithm.
                 X1p = simulationTS_SSR_GPU(alpha, beta_p * (c_p*(1-a^alpha)/scale)^(1/alpha), scale, nSim) ...
                     * (c_p*(1-a^alpha)/scale)^(1/alpha);

@@ -15,6 +15,10 @@ function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity)
 N = 2^Mfft; % Needed for optimal du computation
 [du, a] = extraParamsComputation(model, activity, params, N, dt);
 
+if params(1)>0 && params(1) < 1
+    du = du*params(1);
+end
+
 % Compute the parameters for the FFT discretization.
 u_N = 0.5 * du * (N - 1); u_1 = -u_N;
 dx = 2 * pi / (N * du); x_1 = -dx * (N - 1) / 2; x_N = -x_1;

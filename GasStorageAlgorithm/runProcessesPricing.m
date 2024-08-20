@@ -17,10 +17,14 @@ AV_NO = 0;
 POLYNOMIAL = 1;
 BSPLINE = 2;
 
-%% Set up FLAGS for rates simluation.
+%% Set up FLAGS for rates simulation.
 NULL = 0;
 CIR = 1;
 VASICEK = 2;
+
+%% Set up FLAGS for GPU acceleration
+GPU_NO = 0;
+GPU_YES = 1;
 
 %% Define the struct for storage pricing.
 
@@ -52,11 +56,12 @@ contract.Costs.SpreadProfit = 0; %b2
 % [alpha, b, sigma, k, theta].
 % If OU-TS or TS-OU are selected, parameters should be given as 
 % [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c].
-contract.GasProcess = OU_TS_FGMC;
+contract.GasProcess = OU_TS_DR;
 contract.GasParameters = [0.7, 0.1, 2.5, 3.5, 0.5, 1, 0]; % Parameters for TS.
-contract.GasParameters = [0.7, 0.2162, 0.201, 0.256, 0]; % Parameters for NTS.
-contract.GasParameters = [0.7, 0.0315, 0.05, 0, 0]; % Parameters for OU.
+% contract.GasParameters = [0.7, 0.2162, 0.201, 0.256, 0]; % Parameters for NTS.
+% contract.GasParameters = [0.7, 0.0315, 0.05, 0, 0]; % Parameters for OU.
 contract.AV = AV_NO;
+contract.GPU = GPU_NO;
 
 % RATES SIMULATIONS.
 % CIR, Vasicek, NULL (zeros) simulations available, give proper parameters.

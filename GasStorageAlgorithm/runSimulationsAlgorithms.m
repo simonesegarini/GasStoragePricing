@@ -7,12 +7,17 @@ OU_TS_DR = 23; TS_OU_DR = 33;
 
 OU_NTS = 4; NTS_OU = 5;
 
+%% Set up FLAGS for GPU acceleration
+GPU_NO = 0;
+GPU_YES = 1;
+
 %% Define the struct for processes simulations.
 
 simulation.Simulations = 1e7; % Number of paths simulated.
 simulation.Maturity = 1/12; % Maturity expressed in years.
 simulation.Steps = 1; % Steps for simulation.
 simulation.Seed = 2; % Seed for the rng, NOT mandatory.
+simulation.GPU = GPU_YES;
 
 % SPOT PRICES SIMULATIONS.
 % Process available: OU, OU-NTS, NTS-OU, OU-TS, TS-OU with also all special
@@ -24,11 +29,10 @@ simulation.Seed = 2; % Seed for the rng, NOT mandatory.
 %
 % Stability parameters alphas are to be given in another vector so the
 % script can run for all the desired values.
-simulation.Process = OU_TS_SSR;
+simulation.Process = OU_TS_DR;
 simulation.Parameters = [0.1, 2.5, 3.5, 0.5, 1, 0]; % Parameters for TS.
 % simulation.Parameters = [0.2162, 0.201, 0.256, 0]; % Parameters for NTS.
 simulation.Alphas = [0.8, 0.4, -1.0, -2.0];
-% simulation.Alphas = [0.8];
 
 %% Run the algorithm
 

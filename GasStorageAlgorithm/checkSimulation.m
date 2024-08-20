@@ -41,4 +41,23 @@ if ~isfield(simulation, 'Alphas') || isempty(simulation.Alphas)
     error('Invalid setting, check simulation.Alphas field.');
 end
 
+% Check for the GPU part.
+if ~isfield(simulation, 'GPU') || isempty(simulation.GPU)
+    error('Invalid setting, check contract.GPU field.')
+else
+    if simulation.GPU == 1
+        % Check if Parallel Computing Toolbox is installed
+        v = ver;
+        if ~any(strcmp({v.Name}, 'Parallel Computing Toolbox'))
+            error('Parallel Computing Toolbox is not installed.');
+        end
+        
+        % Check if a GPU is available
+        g = gpuDeviceCount;
+        if g == 0
+            error('No GPU device found.');
+        end
+    end
+end
+
 end

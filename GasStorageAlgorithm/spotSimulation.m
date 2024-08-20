@@ -1,4 +1,4 @@
-function [S, SAV] = spotSimulation(S0, model, params, nSim, M, T, Mfft, seed)
+function [S, SAV] = spotSimulation(S0, model, params, nSim, M, T, Mfft, GPU_flag, seed)
 % Spot simulation based on model selected: OU returns 2*M simulations by
 % using AV algorithm, OU-NTS and OU-TS return M simulations using fgmc
 % algorithm
@@ -10,6 +10,7 @@ function [S, SAV] = spotSimulation(S0, model, params, nSim, M, T, Mfft, seed)
 % M:                    number of timesteps
 % T:                    time horizon
 % Mfft:                 parameter for FFT
+% GPU_flag              flag for GPU usage
 % seed:                 set the seed of the simulation (optional)
 %
 % OUTPUT:
@@ -27,19 +28,19 @@ switch model
         Xs = fgmc('OU-TS', params, nSim, M, T, Mfft);
 
     case 22 % OU-TS EXDE SSR
-        Xs = exDe('OU-TS', params, nSim, M, T, 'SSR');
+        Xs = exDe('OU-TS', params, nSim, M, T, 'SSR', GPU_flag);
 
     case 23 % OU-TS EXDE DR
-        Xs = exDe('OU-TS', params, nSim, M, T, 'DR');
+        Xs = exDe('OU-TS', params, nSim, M, T, 'DR', GPU_flag);
 
     case 31 % TS-OU FGMC
         Xs = fgmc('TS-OU', params, nSim, M, T, Mfft);
 
     case 32 % TS-OU EXDE SSR
-        Xs = exDe('TS-OU', params, nSim, M, T, 'SSR');
+        Xs = exDe('TS-OU', params, nSim, M, T, 'SSR', GPU_flag);
 
     case 33 % TS-OU EXDE DR
-        Xs = exDe('TS-OU', params, nSim, M, T, 'DR');
+        Xs = exDe('TS-OU', params, nSim, M, T, 'DR', GPU_flag);
 
     case 4 % OU-NTS FGMC
         Xs = fgmc('OU-NTS', params, nSim, M, T, Mfft);
