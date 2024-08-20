@@ -1,4 +1,4 @@
-function [du, a] = extraParamsComputation(model, activity, params, N, dt)
+function [du, a] = extraParamsComputation(model, activity, params, N, dt, STRETCH)
 % Proceed to assign parameters, compute analyticity strip (p_n, p_p) and
 % compute the optimal step du for the FFT code.
 % For the finite activity processes du was found by checking the one that
@@ -13,6 +13,7 @@ function [du, a] = extraParamsComputation(model, activity, params, N, dt)
 % params:               vector of paramteres for the specified model
 % N:                    FFT parameter, 2^M
 % dt:                   time step
+% STRETCH:              parameter to stretch the CDF and handle low alphas
 %
 % OUTPUT:
 % du:                   discretization for the FFT algorithm
@@ -26,8 +27,8 @@ switch model
         k = params(4); theta = params(5);
     
         A_as = sqrt(theta^2 + (2 * sigma^2 * (1 - alpha)) / k);
-        p_n = (theta - A_as) / (sigma^2);
-        p_p = (theta + A_as) / (sigma^2);
+        p_n = (theta - A_as) / (STRETCH*sigma^2);
+        p_p = (theta + A_as) / (STRETCH*sigma^2);
         
         switch activity
             case 'Finite'
@@ -41,9 +42,9 @@ switch model
                     a = 0.5 * max(-p_n, p_p);
                     omega = 2 * alpha;
                     if strcmp(model, 'OU-NTS') % OU-NTS GENERAL CASE
-                        l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt)) / (2 * alpha * b);
+                        l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt)) / (2 * alpha * b) * STRETCH^(2*alpha);
                     else % NTS-OU GENERAL CASE
-                        l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt));
+                        l = 1 / alpha * ((1 - alpha) / k)^(1 - alpha) * (sigma^2 / 2)^alpha * (1 - exp(-2 * alpha * b * dt)) * STRETCH^(2*alpha);
                     end
                     du = (2 * pi * abs(a) / (l * N^omega))^(1 / (omega + 1));
                 end
@@ -52,8 +53,8 @@ switch model
     case {'OU-TS', 'TS-OU'}
         beta_p = params(3); beta_n = params(4); c_p = params(5); c_n = params(6);
     
-        p_n = -beta_p;
-        p_p = beta_n;
+        p_n = -beta_p/STRETCH;
+        p_p = beta_n/STRETCH;
 
         switch activity
             case 'Finite'
@@ -62,7 +63,7 @@ switch model
             case 'Infinite'
                 if alpha == 0 % OU-Gamma case (TS), power decay.
                     a = 0.25 * max(-p_n, p_p);
-                    du = 0.0971;
+                    du = 0.1;
                 else
                     a = 0.5 * max(-p_n, p_p);
                     if strcmp(model, 'OU-TS')
@@ -71,7 +72,7 @@ switch model
                             l = (c_p + c_n) * pi / 2 * (1 - exp(-b * dt)) / b;
                         else % GENERAL OU-TS CASE.
                             omega = alpha;
-                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) / (alpha * b);
+                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) / (alpha * b) * STRETCH^alpha;
                         end
                     else % TS-OU
                         if alpha == 1 % Other special case for TS-OU, exp decay.
@@ -79,7 +80,7 @@ switch model
                             l = (c_p + c_n) * pi / 2 * (1 - exp(-b * dt));
                         else % GENERAL TS-OU CASE.
                             omega = alpha;
-                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt));
+                            l = -(c_p + c_n) * gamma(-alpha) * cos(alpha * pi / 2) * (1 - exp(-alpha * b * dt)) * STRETCH^alpha;
                         end
                     end
                     du = (2 * pi * abs(a) / (l * N^omega))^(1 / (omega + 1));

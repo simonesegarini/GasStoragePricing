@@ -1,4 +1,4 @@
-function Xs = fgmc(model, params, N, M, T, Mfft)
+function Xs = fgmc(model, params, N, M, T, Mfft, STRETCH)
 % Finite General Monte Carlo algorithm for OU-Lévy and Lévy-OU processes.
 %
 % INPUT:
@@ -8,6 +8,7 @@ function Xs = fgmc(model, params, N, M, T, Mfft)
 % M:                    number of timesteps
 % T:                    time horizon
 % Mfft:                 FFT hyperparameter
+% STRETCH:              parameter to stretch the CDF and handle low alphas
 %
 % OUTPUT:
 % X:                    logprices
@@ -46,13 +47,13 @@ end
 % Iteration in discretized time to update the simulations.
 
 % Create approximated CDF.
-[xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity);
+[xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, STRETCH);
 
 % Compute Zt based on the type of process.
 if strcmp(activity, 'Infinite')
     for j = 1:M
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j));
-        XAV(:, j+1) = exp(-b.*dt).*XAV(:, j) + fgmcIA(xgrid_hat, CDF_hat, 1-U(:,j));
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j))/STRETCH;
+        XAV(:, j+1) = exp(-b.*dt).*XAV(:, j) + fgmcIA(xgrid_hat, CDF_hat, 1-U(:,j))/STRETCH;
     end
 elseif strcmp(activity, 'Finite')
     for j = 1:M

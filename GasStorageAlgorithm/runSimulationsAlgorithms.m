@@ -15,6 +15,7 @@ GPU_YES = 1;
 
 simulation.Simulations = 1e7; % Number of paths simulated.
 simulation.Maturity = 1/12; % Maturity expressed in years.
+simulation.Stretch = 1; % Stretch to handle low maturity and low alpha cases.
 simulation.Steps = 1; % Steps for simulation.
 simulation.Seed = 2; % Seed for the rng, NOT mandatory.
 simulation.GPU = GPU_YES;
@@ -29,10 +30,10 @@ simulation.GPU = GPU_YES;
 %
 % Stability parameters alphas are to be given in another vector so the
 % script can run for all the desired values.
-simulation.Process = OU_TS_DR;
-simulation.Parameters = [0.1, 2.5, 3.5, 0.5, 1, 0]; % Parameters for TS.
-% simulation.Parameters = [0.2162, 0.201, 0.256, 0]; % Parameters for NTS.
-simulation.Alphas = [0.8, 0.4, -1.0, -2.0];
+simulation.Process = OU_NTS;
+% simulation.Parameters = [0.1, 2.5, 3.5, 0.5, 1, 0]; % Parameters for TS.
+simulation.Parameters = [0.2162, 0.201, 0.256, 0.1]; % Parameters for NTS.
+simulation.Alphas = [0.8, 0.6, 0.4, 0.2];
 
 %% Run the algorithm
 

@@ -40,7 +40,7 @@ for i=1:numel(simulation.Alphas)
         case 21
             tic
             X = fgmc('OU-TS', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 16);
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 16, simulation.Stretch);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'OU-TS');
         case 22
@@ -58,7 +58,7 @@ for i=1:numel(simulation.Alphas)
         case 31
             tic
             X = fgmc('TS-OU', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 16);
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 16, simulation.Stretch);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'TS-OU');
         case 32
@@ -76,14 +76,14 @@ for i=1:numel(simulation.Alphas)
         case 4
             tic
             X = fgmc('OU-NTS', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 16);
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 16, simulation.Stretch);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'OU-NTS');
 
         case 5
             tic
             X = fgmc('NTS-OU', [simulation.Alphas(i), simulation.Parameters], ...
-                simulation.Simulations, simulation.Steps, simulation.Maturity, 16);
+                simulation.Simulations, simulation.Steps, simulation.Maturity, 16, simulation.Stretch);
             times(i) = toc;
             [TCumulants(i,:), ECumulants(i,:)] = computeCumulants(X(:,end), [simulation.Alphas(i), simulation.Parameters], simulation.Maturity, 'NTS-OU');
     end

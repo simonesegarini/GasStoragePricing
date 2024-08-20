@@ -78,6 +78,11 @@ if ~isfield(contract, 'AV') || isempty(contract.AV)
     error('Invalid setting, check contract.AV field.')
 end
 
+% Check for the Stretch part.
+if ~isfield(contract, 'Stretch') || isempty(contract.Stretch)
+    error('Invalid setting, check contract.Stretch field.');
+end
+
 % Check for the GPU part.
 if ~isfield(contract, 'GPU') || isempty(contract.GPU)
     error('Invalid setting, check contract.GPU field.')

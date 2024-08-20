@@ -41,6 +41,11 @@ if ~isfield(simulation, 'Alphas') || isempty(simulation.Alphas)
     error('Invalid setting, check simulation.Alphas field.');
 end
 
+% Check for the Stretch part.
+if ~isfield(simulation, 'Stretch') || isempty(simulation.Stretch)
+    error('Invalid setting, check simulation.Stretch field.');
+end
+
 % Check for the GPU part.
 if ~isfield(simulation, 'GPU') || isempty(simulation.GPU)
     error('Invalid setting, check contract.GPU field.')

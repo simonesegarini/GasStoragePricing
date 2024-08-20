@@ -79,7 +79,7 @@ if parameters(1) >= 1 && (gasProcess == 22 || gasProcess == 23 || gasProcess == 
 else
     if AV
         % SIMULATION OF UNDERLYINGS.
-        [spotSimulated, spotSimulatedAV] = spotSimulation(contract.SpotInitial, gasProcess, parameters, numberSimulations, M, T, 16, contract.GPU, seed);
+        [spotSimulated, spotSimulatedAV] = spotSimulation(contract.SpotInitial, gasProcess, parameters, numberSimulations, M, T, 16, contract.GPU, contract.STRETCH, seed);
 
         % BACKWARD INDUCTION TO PRICE.
         cashflows_T = penFunc(spotSimulated(:,end), ones(numberSimulations,1)*dV');
