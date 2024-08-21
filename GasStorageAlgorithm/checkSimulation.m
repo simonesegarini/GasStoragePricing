@@ -48,7 +48,7 @@ end
 
 % Check for the GPU part.
 if ~isfield(simulation, 'GPU') || isempty(simulation.GPU)
-    error('Invalid setting, check contract.GPU field.')
+    error('Invalid setting, check simulation.GPU field.')
 else
     if simulation.GPU == 1
         % Check if Parallel Computing Toolbox is installed
