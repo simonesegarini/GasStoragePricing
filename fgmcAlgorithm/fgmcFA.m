@@ -2,13 +2,12 @@ function increments = fgmcFA(xgrid_hat, CDF_hat, U, dt, params, model)
 % FGMC method for Finite Activity processes.
 %
 % INPUT:
+% xgrid_hat:            xgrid of reconstructed cdf
+% CDF_hat               ygrid of reconstructed cdf
 % U:                    matrix with the simulated Uniform RV
-% params:               vector of paramteres for the specified model
-% Mfft:                 parameter for FFT
 % dt:                   time step
+% params:               vector of paramteres for the specified model
 % model:                model selected
-% activity:             model activity, needed for the FA case
-% toll:                 tollerance for CDF selection
 %
 % OUTPUT:
 % increment:            Z_deltaTj, stochastic increment for OU-Levy/Levy-OU
@@ -22,9 +21,6 @@ switch model
         lamb = (1-alpha)./(k*abs(alpha));
         mu = 0;
     case 'NTS-OU'
-        % We have the special case of VG-OU that is FA but the parameters
-        % lambda is the same, the part that change is in LogCharFunc
-        % function.
         b = params(2); k = params(4);
 
         lamb = 2*b/k;
@@ -39,12 +35,13 @@ switch model
         mu = (1-exp(-b.*dt))./b.*(gamma_c + lamb_p.*alpha./beta_p - lamb_n.*alpha./beta_n);
 
     case 'TS-OU'
-        b = params(2); c_p = params(5); c_n = params(6);
+        b = params(2); beta_p = params(3); 
+        beta_n = params(4); c_p = params(5); c_n = params(6); gamma_c = params(7);
 
         lamb_p = c_p*b; 
         lamb_n = c_n*b;
         lamb = lamb_p + lamb_n;
-        mu = 0;
+        mu = (1-exp(-b*dt)) * (gamma_c - c_p/beta_p + c_n/beta_n);
 end
 
 % Check where we have to compute the increment, i.e. where we have jumps in

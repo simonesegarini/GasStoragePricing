@@ -1,4 +1,4 @@
-function X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact)
+function X = fgmc(model, params, N, M, T, Mfft, seed, STRETCH)
 % Finite General Monte Carlo algorithm for OU-Lévy and Lévy-OU processes.
 %
 % INPUT:
@@ -9,17 +9,18 @@ function X = fgmc(model, params, N, M, T, Mfft, seed, scaling_fact)
 % T:                    time horizon
 % Mfft:                 FFT hyperparameter
 % seed:                 set the seed of the simulation
-% scaling_fact:         parameter to stretch the CDF and handle low alphas
+% STRETCH:              parameter to stretch the CDF and handle low alphas
 %
 % OUTPUT:
 % X:                    logprices
+
 
 % Set given seed.
 rng(seed)
 
 % Check if there is a given scaling factor to handle low alphas.
 if nargin < 8
-    scaling_fact = 1;
+    STRETCH = 1;
 end
 
 % Parameters for the discretization.
@@ -55,12 +56,15 @@ end
 % Iteration in discretized time to update the simulations.
 
 % Create approximated CDF.
-[xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, scaling_fact);
+[xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, STRETCH);
 
 % Compute Zt based on the type of process.
 if strcmp(activity, 'Infinite')
     for j = 1:M
-        X(:, j+1) = exp(-b.*dt).*X(:, j) + fgmcIA(xgrid_hat, CDF_hat, U(:,j))./scaling_fact;
+        incr_scaled = fgmcIA(xgrid_hat, CDF_hat, U(:,j));
+        incr = incr_scaled/STRETCH;
+        % incr = incr_scaled;
+        X(:, j+1) = exp(-b.*dt).*X(:, j) + incr;
     end
 elseif strcmp(activity, 'Finite')
     for j = 1:M

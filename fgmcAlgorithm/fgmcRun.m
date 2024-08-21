@@ -129,7 +129,7 @@ timeOUNTSasymm = toc;
 [TCumulantsOUNTSasymm, ECumulantsOUNTSasymm] = computeCumulants(Xt(:,end), [alpha, b, sigma, k, theta], T, 'OU-NTS')
 
 %% NTS-OU SYMMETRIC
-alpha = 0; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0;
+alpha = 0.2; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0;
 
 tic
 Xt = fgmc('NTS-OU', [alpha, b, sigma, k, theta], N, M, T, MFFT, seed, scaling_fact);
@@ -137,7 +137,7 @@ timeNTSOUsymm = toc;
 [TCumulantsNTSOUsymm, ECumulantsNTSOUsymm] = computeCumulants(Xt(:,end), [alpha, b, sigma, k, theta], T, 'NTS-OU')
 
 %% NTS-OU ASYMMETRIC
-alpha = 0; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0.1;
+alpha = 0.2; b = 0.2162; sigma = 0.201; k = 0.256; theta = 0.1;
 
 tic
 Xt = fgmc('NTS-OU', [alpha, b, sigma, k, theta], N, M, T, MFFT, seed, scaling_fact);
@@ -145,7 +145,7 @@ timeNTSOUasymm = toc;
 [TCumulantsNTSOUasymm, ECumulantsNTSOUasymm] = computeCumulants(Xt(:,end), [alpha, b, sigma, k, theta], T, 'NTS-OU')
 
 %% OU-TS
-alpha = 1; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
+alpha = 0; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 tic
 Xt = fgmc('OU-TS', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, MFFT, seed, scaling_fact);
@@ -153,7 +153,7 @@ timeOUTS = toc;
 [TCumulantsOUTS, ECumulantsOUTS] = computeCumulants(Xt(:,end), [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], T, 'OU-TS')
 
 %% TS-OU
-alpha = 0.4; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
+alpha = 0; b = 0.1; beta_p = 2.5; beta_n = 3.5; c_p = 0.5; c_n = 1; gamma_c = 0;
 
 tic
 Xt = fgmc('TS-OU', [alpha, b, beta_p, beta_n, c_p, c_n, gamma_c], N, M, T, MFFT, seed, scaling_fact);
