@@ -16,7 +16,7 @@ function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, STR
 N = 2^Mfft; % Needed for optimal du computation
 [du, a] = extraParamsComputation(model, activity, params, N, dt, STRETCH);
 
-if params(1)>0 && params(1) < 1
+if params(1)>0 && params(1) < 1 && strcmp(model, 'NTS-OU')
     du = du*params(1);
 end
 

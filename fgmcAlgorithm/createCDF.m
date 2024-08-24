@@ -16,7 +16,7 @@ function [xgrid_hat, CDF_hat] = createCDF(params, Mfft, dt, model, activity, STR
 N = 2^Mfft; % Number of FFT points
 [du, a] = extraParamsComputation(model, activity, params, N, dt, STRETCH);
 
-if params(1)>0 && params(1) < 1
+if params(1)>0 && params(1) < 1 && strcmp(model, 'NTS-OU')
     du = du*params(1);
 end
 
@@ -26,10 +26,10 @@ x_1 = -dx * (N - 1) / 2; x_N = -x_1;
 u_N = 0.5 * du * (N - 1); u_1 = -u_N;
 
 Ra = a < 0;
-disp(['Step du = ', num2str(du)])
-disp(['Step dx = ', num2str(dx)])
-disp(['Params a = ', num2str(a)])
-disp(' ')
+% disp(['Step du = ', num2str(du)])
+% disp(['Step dx = ', num2str(dx)])
+% disp(['Params a = ', num2str(a)])
+% disp(' ')
 
 % Assign values to the struct for the FFT function.
 numericalParams.M = Mfft;
@@ -62,14 +62,14 @@ RawCDF = RawCDF(valid_idxs);
 xgrid_hat = xgrid_hat(idxs_unique);
 
 % Plot for debugging
-alpha = params(1);
-figure;
-plot(xgrid, RawCDF, '-k');
-title(['Plot with alpha = ', num2str(alpha)])
-xlim([-1, 1])
-hold on
-plot(xgrid_hat, CDF_hat, '--r')
-first_last = [xgrid_hat(1), CDF_hat(1); xgrid_hat(end), CDF_hat(end)];
-plot(first_last(:, 1), first_last(:, 2), '*g')
-ylim([0, 1])
+% alpha = params(1);
+% figure;
+% plot(xgrid, RawCDF, '-k');
+% title(['Plot with alpha = ', num2str(alpha)])
+% xlim([-1, 1])
+% hold on
+% plot(xgrid_hat, CDF_hat, '--r')
+% first_last = [xgrid_hat(1), CDF_hat(1); xgrid_hat(end), CDF_hat(end)];
+% plot(first_last(:, 1), first_last(:, 2), '*g')
+% ylim([0, 1])
 end

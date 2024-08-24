@@ -44,12 +44,15 @@ switch model
 
     case 'NTS-OU'
         % Assign parameters.
+        alpha = params(1);
         b = params(2); sigma = params(3);
         k = params(4); theta = params(5);
 
         % Infinite activity case, also the general one.
         if strcmp(activity, 'Infinite')
-            values = psiXNTS(us, params) - psiXNTS(us*exp(-b*t), params);
+            values = (1-alpha)/(k*alpha) * ((1-1i*k/(1-alpha)*...
+                (theta.*us.*exp(-b*t) + 1i.*0.5.*(sigma^2.*us.^2.*exp(-2*b*t)))).^alpha -...
+                (1 - 1i*k/(1-alpha) * (theta*us + 1i*0.5*sigma^2.*us.^2)).^alpha);
 
         % VG-OU case. Here is implemented with the direct formula, can be
         % computed also with the decomposed formula by using psiXNTS.
@@ -125,8 +128,10 @@ switch model
                     c_n*beta_n*((1+ 1i.*us./beta_n).*log(1+ 1i.*us./beta_n) - ...
                     (1+1i.*us.*exp(-b*t)./beta_n).*log(1+1i.*us.*exp(-b*t)./beta_n));
 
-            else % General case. (This one correctly implemented)
-                values = psiXTS(us, params) - psiXTS(us*exp(-b*t), params);
+            else % General case.
+                values = 1i * us * (1 - exp(-b * t)) * (gamma_c - c_p * gamma(1 - alpha) * beta_p^(alpha - 1) + c_n * gamma(1 - alpha) * beta_n^(alpha - 1)) ...
+                        + c_p * gamma(-alpha) * ((beta_p - 1i * us).^alpha - (beta_p - 1i * us * exp(-b * t)).^alpha) ...
+                        + c_n * gamma(-alpha) * ((beta_n + 1i * us).^alpha - (beta_n + 1i * us * exp(-b * t)).^alpha);
             end
         
         % Gamma-OU case.
