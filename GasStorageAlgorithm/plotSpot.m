@@ -11,6 +11,8 @@ function plotSpot(row_indices, S, type_FLAG, save)
 n = length(row_indices);
 
 figure;
+set(gcf, 'Position', [100, 100, 800, 600]); % Adjust figure size for better visibility
+
 switch type_FLAG
     case 1
         type = 'OU';
@@ -34,16 +36,17 @@ end
 
 for i = 1:n
     subplot(sqrt(n), sqrt(n), i);
-    plot(S(row_indices(i), :));
+    plot(S(row_indices(i), :), 'LineWidth', 1.5); % Increase line width for better visibility
     grid on;
-    xlabel('Days');
-    ylabel('Spot Price');
-    title(['Scenario ', num2str(row_indices(i)), ' ', type]);
+    xlabel('Days', 'FontSize', 10); % Adjust font size for labels
+    ylabel('Spot Price', 'FontSize', 10);
+    title(['Scenario ', num2str(row_indices(i)), ' - ', type], 'FontSize', 12); % Adjust title font size
 end
+
 
 % Save the plot if asked.
 if save == 1
     name = sprintf('plotPrice_%s.eps', type);
-    print('-depsc2', name);
+    saveas(gcf, name);
 end
 end

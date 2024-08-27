@@ -128,9 +128,11 @@ else
     simulationsPlot = [1, 5, 25, 50];
 end
 
-plotSpot(simulationsPlot, spotSimulated, gasProcess, 0)
 if AV
-    plotPriceDistribution(0.5*(cashflows(:,index_V0) + cashflowsAV(:,index_V0)), numberSimulations, gasProcess, parameters(1), 0)
+    plotSpot(simulationsPlot, spotSimulated, gasProcess, 1)
+    plotSpot(simulationsPlot, spotSimulatedAV, gasProcess, 0)
+    plotPriceDistribution(0.5*(cashflows(:,index_V0) + cashflowsAV(:,index_V0)), numberSimulations, gasProcess, parameters(1), 1)
 elseif ~AV
-    plotPriceDistribution(cashflows(:,index_V0), numberSimulations, gasProcess, parameters(1), 0)
+    plotSpot(simulationsPlot, spotSimulated, gasProcess, 1)
+    plotPriceDistribution(cashflows(:,index_V0), numberSimulations, gasProcess, parameters(1), 1)
 end

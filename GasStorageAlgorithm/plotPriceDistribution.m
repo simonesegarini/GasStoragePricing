@@ -1,5 +1,5 @@
 function plotPriceDistribution(prices, numberSimulations, model, extraParam, save)
-% Plot the distribution of the prices of the storage contract as an histogram 
+% Plot the distribution of the prices of the storage contract as a histogram 
 % and save for reports.
 %
 % INPUT:
@@ -10,7 +10,8 @@ function plotPriceDistribution(prices, numberSimulations, model, extraParam, sav
 % save:                 0/1 to save the plot
 
 figure;
-histogram(prices, 'NumBins', numberSimulations/10)
+histogram(prices, 'NumBins', max(10, numberSimulations / 10), 'Normalization', 'probability', 'FaceColor', [0.2 0.2 0.8]);
+grid on;
 
 % Switch to handle the title info based on the process.
 switch model
@@ -30,18 +31,21 @@ switch model
         type = 'OU-NTS';
     case 5
         type = 'NTS-OU';
+    otherwise
+        type = 'OU';
 end
 
-switch model
-    case 1
-        title(['Value distribution (' num2str(numberSimulations) ' paths), OU']);
-    otherwise 
-        title(['Value distribution (' num2str(numberSimulations) ' paths), ' type, ', alpha = ', num2str(extraParam)])
+% Set the title based on the model
+if model == 1
+    title(['Value distribution (', num2str(numberSimulations), ' paths), OU'], 'FontSize', 12);
+else
+    title(['Value distribution (', num2str(numberSimulations), ' paths), ', type, ', \alpha = ', num2str(extraParam)], 'FontSize', 12);
 end
-ylabel('Frequency')
-xlabel('Value [Euro]')
 
-% Save the plot if asked.
+ylabel('Frequency', 'FontSize', 10);
+xlabel('Value [Euro]', 'FontSize', 10);
+
+% Save the plot if requested
 if save == 1
     name = sprintf('plotStoragePrices_%s.eps', type);
     print('-depsc2', name);
